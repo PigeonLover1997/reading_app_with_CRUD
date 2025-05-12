@@ -35,3 +35,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Secrets
+*.key
+*.pem
+MyAPIKey.txt
+src/main/resources/application.properties

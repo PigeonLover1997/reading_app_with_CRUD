@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>問題を解く</title>
+  <style>
+    body { font-family: sans-serif; margin: 1em; }
+    .flex-container {
+      display: flex;
+      gap: 1em;
+    }
+    .passage, .questions {
+      border: 1px solid #ccc;
+      padding: 1em;
+      overflow-y: auto;
+    }
+    .passage {
+      flex: 1 1 50%;
+      max-height: 80vh;
+    }
+    .questions {
+      flex: 1 1 50%;
+      max-height: 80vh;
+    }
+    /* モバイル対応: 上下配置 */
+    @media (max-width: 768px) {
+      .flex-container {
+        flex-direction: column;
+      }
+      .passage, .questions {
+        max-height: 40vh;
+      }
+    }
+    .mcq { margin-bottom: 1em; }
+    .mcq-options label { display: block; }
+  </style>
+</head>
+<body>
+  <h1>問題を解く</h1>
+  <div class="flex-container">
+    <!-- 左: パッセージ表示 -->
+    <div class="passage">
+      <h2>問題文</h2>
+      <p th:text="${task.passage}">ここに英語の長文が表示されます。</p>
+    </div>
+
+    <!-- 右: 選択式＋要約 -->
+    <div class="questions">
+      <form th:action="@{/submitAnswers}" method="post">
+        <!-- 選択式問題 -->
+        <h2>選択式問題</h2>
+        <div th:each="mcq,iterStat : ${task.mcqs}" class="mcq">
+          <p>
+            <strong th:text="${iterStat.index + 1} + '. ' + mcq.question">
+              質問文
+            </strong>
+          </p>
+          <div class="mcq-options" th:each="opt,optStat : ${mcq.options}">
+            <label>
+              <input type="radio"
+                     th:name="${'mcq_' + iterStat.index}"
+                     th:value="${optStat.index}"
+                     required/> 
+              <span th:text="${opt}">選択肢</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 要約問題 -->
+        <h2>要約問題</h2>
+        <p th:text="${task.summaryPrompt}">ここに要約問題の指示が表示されます。</p>
+        <textarea name="summaryAnswer" rows="5" style="width:100%;" required></textarea>
+
+        <button type="submit">回答を送信</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

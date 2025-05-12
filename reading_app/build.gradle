@@ -32,8 +32,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	// https://docs.spring.io/spring-boot/reference/actuator/enabling.html#actuator.enabling
-	// 20250512 spring-boot-starter-actuatorを追加
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	// annotationProcessorを追加
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 }
 
 tasks.named('test') {
