@@ -1,47 +1,99 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ja">
+
 <head>
   <meta charset="UTF-8" />
-  <title>問題を解く</title>
+  <title>出題ページ</title>
   <style>
-    body { font-family: sans-serif; margin: 1em; }
+    body {
+      font-family: sans-serif;
+      margin: 1em;
+    }
+
+    /* ヘッダーとタイマー */
+    .header-container {
+      position: relative;
+      margin-bottom: 1em;
+    }
+
+    .header-container h1 {
+      display: inline-block;
+    }
+
+    #timer {
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-size: 0.8em;
+      color: #555;
+    }
+
+    /* レイアウト */
     .flex-container {
       display: flex;
       gap: 1em;
     }
-    .passage, .questions {
+
+    .passage,
+    .questions {
       border: 1px solid #ccc;
       padding: 1em;
       overflow-y: auto;
     }
+
     .passage {
       flex: 1 1 50%;
       max-height: 80vh;
     }
+
     .questions {
       flex: 1 1 50%;
       max-height: 80vh;
     }
-    /* モバイル対応: 上下配置 */
+
     @media (max-width: 768px) {
       .flex-container {
         flex-direction: column;
       }
-      .passage, .questions {
+
+      .passage,
+      .questions {
         max-height: 40vh;
       }
     }
-    .mcq { margin-bottom: 1em; }
-    .mcq-options label { display: block; }
+
+    /* MCQ */
+    .mcq {
+      margin-bottom: 1em;
+    }
+
+    .mcq-options label {
+      display: block;
+    }
+
+    /* 語数表示・入力カウンタ */
+    #passageWordCount,
+    #summaryWordCount {
+      font-size: 0.8em;
+      color: #555;
+      margin-top: 0.5em;
+    }
   </style>
 </head>
+
 <body>
-  <h1>問題を解く</h1>
+  <!-- ヘッダー＋タイマー -->
+  <div class="header-container">
+    <h1>出題ページ</h1>
+    <div id="timer">00:00</div>
+  </div>
+
   <div class="flex-container">
-    <!-- 左: パッセージ表示 -->
+    <!-- 左: 問題文 -->
     <div class="passage">
       <h2>問題文</h2>
       <p th:text="${task.passage}">ここに英語の長文が表示されます。</p>
+      <div id="passageWordCount">(0 words)</div>
     </div>
 
     <!-- 右: 選択式＋要約 -->
@@ -51,16 +103,13 @@
         <h2>選択式問題</h2>
         <div th:each="mcq,iterStat : ${task.mcqs}" class="mcq">
           <p>
-            <strong th:text="${iterStat.index + 1} + '. ' + mcq.question">
+            <strong th:text="${(iterStat.index + 1) + '. ' + mcq.question}">
               質問文
             </strong>
           </p>
           <div class="mcq-options" th:each="opt,optStat : ${mcq.options}">
             <label>
-              <input type="radio"
-                     th:name="${'mcq_' + iterStat.index}"
-                     th:value="${optStat.index}"
-                     required/> 
+              <input type="radio" th:name="${'mcq_' + iterStat.index}" th:value="${optStat.index}" required />
               <span th:text="${opt}">選択肢</span>
             </label>
           </div>
@@ -69,11 +118,49 @@
         <!-- 要約問題 -->
         <h2>要約問題</h2>
         <p th:text="${task.summaryPrompt}">ここに要約問題の指示が表示されます。</p>
-        <textarea name="summaryAnswer" rows="5" style="width:100%;" required></textarea>
+        <textarea id="summaryAnswer" name="summaryAnswer" rows="5" style="width:100%;" required></textarea>
+        <div id="summaryWordCount">(words count: 0)</div>
 
         <button type="submit">回答を送信</button>
       </form>
     </div>
   </div>
+
+  <script>
+    // --- タイマー処理 ---
+    const timerEl = document.getElementById('timer');
+    const startTime = Date.now();
+    function updateTimer() {
+      const diff = Math.floor((Date.now() - startTime) / 1000);
+      const mm = String(Math.floor(diff / 60)).padStart(2, '0');
+      const ss = String(diff % 60).padStart(2, '0');
+      timerEl.textContent = `${mm}:${ss}`;
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // --- 単語数カウント関数 ---
+    function countWords(text) {
+      const trimmed = text.trim();
+      return trimmed ? trimmed.split(/\s+/).length : 0;
+    }
+
+    // --- 問題文の語数表示 ---
+    window.addEventListener('load', () => {
+      const passageText = document.querySelector('.passage p').textContent;
+      const wc = countWords(passageText);
+      document.getElementById('passageWordCount')
+        .textContent = `(${wc} words)`;
+    });
+
+    // --- 要約テキストエリアの語数リアルタイムカウント ---
+    const summaryArea = document.getElementById('summaryAnswer');
+    const summaryCountEl = document.getElementById('summaryWordCount');
+    summaryArea.addEventListener('input', () => {
+      const wc = countWords(summaryArea.value);
+      summaryCountEl.textContent = `(words count: ${wc})`;
+    });
+  </script>
 </body>
+
 </html>

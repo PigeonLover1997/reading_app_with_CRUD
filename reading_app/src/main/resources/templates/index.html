@@ -1,23 +1,35 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ja">
+
 <head>
   <meta charset="UTF-8" />
   <title>問題生成フォーム</title>
   <style>
-    /* 省略: 前と同様 */
+    body {
+      font-family: sans-serif;
+      margin: 2em;
+    }
+
+    .field {
+      margin-bottom: 1em;
+    }
+
+    .inline-radio {
+      display: inline-block;
+      margin-right: 0.5em;
+    }
   </style>
 </head>
+
 <body>
   <h1>英語読解問題ジェネレータ</h1>
   <form th:action="@{/generate}" method="post">
     <!-- 難易度 -->
     <div class="field">
-      <label>難易度 (CEFR):</label><br/>
+      <label>難易度 (CEFR):</label><br />
       <div th:each="lvl : ${levels}">
         <label>
-          <input type="radio" name="difficulty"
-                 th:value="${lvl}"
-                 th:checked="${lvl=='B1'}" />
+          <input type="radio" name="difficulty" th:value="${lvl}" th:checked="${lvl=='B1'}" />
           <span th:text="${lvl}">B1</span>
         </label>
       </div>
@@ -25,56 +37,76 @@
 
     <!-- 語数（目安） -->
     <div class="field">
-      <label>語数（目安）:</label><br/>
+      <label>語数（目安）:</label><br />
       <!-- テンプレートからリストを回す -->
       <div th:each="cnt : ${defaultWordCounts}">
         <label>
-          <input type="radio" name="wordCountRadio"
-                 th:value="${cnt}"
-                 th:checked="${cnt==300}" />
-          <span th:text="${cnt}"/>語
+          <input type="radio" name="wordCountRadio" th:value="${cnt}" th:checked="${cnt==300}" />
+          <span th:text="${cnt}" />語
         </label>
       </div>
       <!-- 自由入力 -->
       <label>
         <input type="radio" name="wordCountRadio" value="0" />
         自由入力：
-        <input type="number" name="customWordCount"
-               min="1" placeholder="希望語数" />
+        <input type="number" name="customWordCount" min="1" placeholder="希望語数" />
         語
       </label>
     </div>
 
     <!-- 問題数 -->
     <div class="field">
-      <label>選択式問題の数:</label><br/>
+      <label>選択式問題の数:</label><br />
       <!-- テンプレートからリストを回す -->
       <div th:each="num : ${defaultQuestionCounts}">
         <label>
-          <input type="radio" name="questionCountRadio"
-                 th:value="${num}"
-                 th:checked="${num==3}" />
-          <span th:text="${num}"/>問
+          <input type="radio" name="questionCountRadio" th:value="${num}" th:checked="${num==3}" />
+          <span th:text="${num}" />問
         </label>
       </div>
       <!-- 自由入力 -->
       <label>
         <input type="radio" name="questionCountRadio" value="0" />
         自由入力：
-        <input type="number" name="customQuestionCount"
-               min="1" placeholder="希望問題数" />
+        <input type="number" name="customQuestionCount" min="1" placeholder="希望問題数" />
         問
       </label>
     </div>
 
     <!-- トピック -->
     <div class="field">
-      <label for="topic">トピック（任意）:</label><br/>
-      <input type="text" id="topic" name="topic"
-             placeholder="例: Environment"/>
+      <label for="topic">トピック（任意）:</label><br />
+      <input type="text" id="topic" name="topic" placeholder="例: Environment" />
     </div>
 
     <button type="submit">問題を生成</button>
   </form>
+  <script>
+    // ページロード時＆ラジオ選択時にカスタム欄の有効・無効を切り替える
+    document.addEventListener('DOMContentLoaded', () => {
+      // 語数まわり
+      const wordRadios = document.querySelectorAll('input[name="wordCountRadio"]');
+      const customWord = document.querySelector('input[name="customWordCount"]');
+      wordRadios.forEach(r => r.addEventListener('change', toggleWordInput));
+      function toggleWordInput() {
+        const useCustom = document.querySelector('input[name="wordCountRadio"]:checked').value === '0';
+        customWord.disabled = !useCustom;
+        if (!useCustom) customWord.value = '';
+      }
+      toggleWordInput(); // 初期状態
+
+      // 問題数まわり
+      const quesRadios = document.querySelectorAll('input[name="questionCountRadio"]');
+      const customQues = document.querySelector('input[name="customQuestionCount"]');
+      quesRadios.forEach(r => r.addEventListener('change', toggleQuesInput));
+      function toggleQuesInput() {
+        const useCustom = document.querySelector('input[name="questionCountRadio"]:checked').value === '0';
+        customQues.disabled = !useCustom;
+        if (!useCustom) customQues.value = '';
+      }
+      toggleQuesInput(); // 初期状態
+    });
+  </script>
 </body>
+
 </html>

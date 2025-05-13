@@ -41,12 +41,15 @@ public class HomeController {
             @RequestParam(value = "customQuestionCount", required = false) Integer customQuestionCount,
             @RequestParam(value = "topic", required = false) String topic,
             Model model) {
-        int wordCount = (customWordCount != null && customWordCount > 0)
+        // ラジオが 0 のときだけ自由入力、それ以外はラジオ値
+        int wordCount = (wordCountRadio == 0 && customWordCount != null && customWordCount > 0)
                 ? customWordCount
                 : wordCountRadio;
-        int questionCount = (customQuestionCount != null && customQuestionCount > 0)
+
+        int questionCount = (questionCountRadio == 0 && customQuestionCount != null && customQuestionCount > 0)
                 ? customQuestionCount
                 : questionCountRadio;
+
         if (topic == null)
             topic = "";
 
