@@ -109,8 +109,16 @@
           </p>
           <div class="mcq-options" th:each="opt,optStat : ${mcq.options}">
             <label>
-              <input type="radio" th:name="${'mcq_' + iterStat.index}" th:value="${optStat.index}" required />
-              <span th:text="${opt}">選択肢</span>
+              <input
+      type="radio"
+      th:name="${'mcq_' + iterStat.index}"
+      th:value="${'ABCD'.substring(optStat.index, optStat.index + 1)}"
+      required
+    />
+    <!-- ラベルはここで付与 -->
+    <span th:text="${'(' + 'ABCD'.substring(optStat.index, optStat.index + 1) + ') ' + opt}"/>
+    <!-- <span th:text="${'(' + 'ABCD'.substring(optStat.index, optStat.index + 1) + ') ' + opt}"> -->
+    </span>
             </label>
           </div>
         </div>
@@ -118,7 +126,7 @@
         <!-- 要約問題 -->
         <h2>要約問題</h2>
         <p th:text="${task.summaryPrompt}">ここに要約問題の指示が表示されます。</p>
-        <textarea id="summaryAnswer" name="summaryAnswer" rows="5" style="width:100%;" required></textarea>
+        <textarea id="summaryAnswer" name="summaryAnswer" rows="5" style="width:100%;"></textarea>
         <div id="summaryWordCount">(words count: 0)</div>
 
         <button type="submit">回答を送信</button>

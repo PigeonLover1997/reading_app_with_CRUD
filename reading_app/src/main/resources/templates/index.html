@@ -29,8 +29,8 @@
       <label>難易度 (CEFR):</label><br />
       <div th:each="lvl : ${levels}">
         <label>
-          <input type="radio" name="difficulty" th:value="${lvl}" th:checked="${lvl=='B1'}" />
-          <span th:text="${lvl}">B1</span>
+          <input type="radio" name="difficulty" th:value="${lvl}" th:checked="${lvl=='B2'}" />
+          <span th:text="${lvl}">B2</span>
         </label>
       </div>
     </div>
@@ -41,7 +41,7 @@
       <!-- テンプレートからリストを回す -->
       <div th:each="cnt : ${defaultWordCounts}">
         <label>
-          <input type="radio" name="wordCountRadio" th:value="${cnt}" th:checked="${cnt==300}" />
+          <input type="radio" name="wordCountRadio" th:value="${cnt}" th:checked="${cnt==200}" />
           <span th:text="${cnt}" />語
         </label>
       </div>
@@ -60,7 +60,7 @@
       <!-- テンプレートからリストを回す -->
       <div th:each="num : ${defaultQuestionCounts}">
         <label>
-          <input type="radio" name="questionCountRadio" th:value="${num}" th:checked="${num==3}" />
+          <input type="radio" name="questionCountRadio" th:value="${num}" th:checked="${num==1}" />
           <span th:text="${num}" />問
         </label>
       </div>

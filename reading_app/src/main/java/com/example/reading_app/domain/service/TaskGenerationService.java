@@ -1,6 +1,5 @@
 package com.example.reading_app.domain.service;
 
-import com.example.reading_app.domain.model.MCQDto;
 import com.example.reading_app.domain.model.ReadingTaskDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,24 +34,39 @@ public class TaskGenerationService {
     /**
      * ユーザー指定のパラメータでタスクを生成
      *
-     * @param difficulty CEFR レベル ("A1"～"C2")
-     * @param wordCount  パッセージの語数（おおよそ）
+     * @param difficulty    CEFR レベル ("A1"～"C2")
+     * @param wordCount     パッセージの語数（おおよそ）
      * @param questionCount 選択式問題の数
-     * @param topic      トピック（空文字でランダム）
+     * @param topic         トピック（空文字でランダム）
      * @return Task オブジェクト（パッセージ・MCQリスト・要約プロンプトを含む）
      */
     public ReadingTaskDto generateTask(String difficulty, int wordCount, int questionCount, String topic) {
         // ① ChatGPT に与えるシステム指示
         String systemPrompt = "You are an English teacher. "
-            + "Generate an English reading passage of about " + wordCount + " words at CEFR level " + difficulty
-            + " on the topic '" + (topic.isBlank() ? "a random topic" : topic) + "'. "
-            + "Then create " + questionCount + " multiple-choice questions (4 options each) "
-            + "and provide a summary question prompt. "
-            + "Even if the topic is given in Japanese, always respond in English. "
-            + "Respond in JSON with keys: "
-            + "\"passage\" (string), "
-            + "\"mcqs\" (array of {question:string, options:[string], answerIndex:int}), "
-            + "\"summaryPrompt\" (string).";
+                + "Generate an English reading passage of about " + wordCount + " words at CEFR level " + difficulty
+                + " on the topic '" + (topic.isBlank() ? "a random topic" : topic) + "'. "
+                + "If the topic is 'a random topic', choose one at random from a wide range, such as "
+                + "history, science, travel, culture, technology, nature, art, daily life, "
+                + "sports, health, environment, education, economics, fashion, psychology, "
+                + "architecture, literature, music, food, festivals, space exploration, politics, "
+                + "philosophy, transportation, wildlife conservation—"
+                + "but not limited to these; feel free to pick any other topic as well. "
+                + "Also, when you pick from a broad category (e.g. culture), select a different specific subtopic each time for variety. "
+                + "Then create " + questionCount + " multiple-choice questions (4 options each) "
+                + "and provide a summary question prompt. "
+                + "Even if the topic is given in Japanese, always generate the passage, multiple-choice questions and the summary question prompt in English. "
+                // + "For each multiple-choice question, the \"options\" array in the JSON must
+                // contain exactly four strings, "
+                // + "each prefixed with its label in parentheses: "
+                // + "first option text, second option text, third option text, fourth option
+                // text. "
+                // + "Also include the correct label (\"A\", \"B\", \"C\", or \"D\") in the
+                // field \"answerLabel\". "
+                + "Incorrect options must be misleading unless the test taker fully understands the passage. "
+                + "Respond in JSON with keys: "
+                + "\"passage\" (string), "
+                + "\"mcqs\" (array of {question:string, options:[string], answerLabel:string}), "
+                + "\"summaryPrompt\" (string).";
 
         // ② リクエストボディを構築
         Map<String, Object> body = new HashMap<>();
