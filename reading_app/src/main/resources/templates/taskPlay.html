@@ -91,7 +91,7 @@
   <div class="flex-container">
     <!-- 左: 問題文 -->
     <div class="passage">
-      <h2>問題文</h2>
+      <h2><strong><em th:text="${task.title}">記事タイトル</em></strong></h2>
       <p th:text="${task.passage}">ここに英語の長文が表示されます。</p>
       <div id="passageWordCount">(0 words)</div>
     </div>

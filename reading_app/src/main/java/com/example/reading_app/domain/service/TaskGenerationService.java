@@ -38,19 +38,41 @@ public class TaskGenerationService {
      * @param wordCount     パッセージの語数（おおよそ）
      * @param questionCount 選択式問題の数
      * @param topic         トピック（空文字でランダム）
-     * @return Task オブジェクト（パッセージ・MCQリスト・要約プロンプトを含む）
+     * @return ReadingTaskDto オブジェクト（問題文・タイトル・難易度・選択式問題リスト・要約課題用プロンプトを含む）
      */
     public ReadingTaskDto generateTask(String difficulty, int wordCount, int questionCount, String topic) {
+
         // ① ChatGPT に与えるシステム指示
         String systemPrompt = "You are an expert English writer whose articles are famous for their interesting content. "
-                + "Generate an English reading passage of about " + wordCount + " words at CEFR level " + difficulty
+                + "Your task is to generate an interesting reading passage and multiple-choice questions for English learners. "
+                + "The passage should be in multiple paragraphs, using clear paragraph breaks. "
+                + "Insert a blank line (double line break) between paragraphs for readability, and begin each paragraph with two spaces for indentation. "
+                + "Generate an English reading passage at CEFR level " + difficulty
                 + " on the topic '" + (topic.isBlank() ? "a random topic" : topic) + "'. "
+                // 語数指定を確認  語数が多くなると指定より出力が少なくなる傾向があるので、指定語数に応じて補正をかける
+                + "Check the following designated word count: " + wordCount + ". "
+                // 語数指定が ～150の場合は、指定語数の 0.9倍～1.1 倍になるように指示
+                + "If the designated word count is less than 150, the passage **must have between "
+                + (int) (wordCount * 0.9) + " and " + (int) (wordCount * 1.1) + " English words**. "
+                // 語数指定が 151～300の場合は、指定語数の 1.1倍～1.3 倍になるように指示
+                + "Else if the designated word count is between 151 and 300, the passage **must have between "
+                + (int) (wordCount * 1.1) + " and " + (int) (wordCount * 1.3) + " English words**. "
+                // 語数指定が 301～450の場合は、指定語数の 1.3倍～1.5 倍になるように指示
+                + "Else if the designated word count is between 301 and 450, the passage **must have between "
+                + (int) (wordCount * 1.3) + " and " + (int) (wordCount * 1.5) + " English words**. "
+                // 語数指定が 451～600の場合は、指定語数の 1.7倍～2.0 倍になるように指示
+                + "Else if the designated word count is between 451 and 600, the passage **must have between "
+                + (int) (wordCount * 1.7) + " and " + (int) (wordCount * 2.0) + " English words**. "
+                // 語数指定が 601～の場合は、指定語数の 2.0倍～2.5 倍になるように指示
+                + "Else if the designated word count is 601 or more, the passage **must have between "
+                + (int) (wordCount * 2.0) + " and " + (int) (wordCount * 2.5) + " English words**. "
+                + "Use the following method to count words: count the number of sequences that match the regular expression \\b\\w+\\b in the passage. "
                 + "If the topic is 'a random topic', choose one at random from a wide range, such as "
                 + "history, science, travel, culture, technology, nature, art, daily life, "
-                + "sports, health, environment, education, economics, fashion, psychology, "
-                + "architecture, literature, music, food, festivals, space exploration, politics, "
-                + "philosophy, transportation etc."
+                + "sports, health, environment, education, economics, philosophy, psychology, "
+                + "architecture, literature, music, food, festivals, space exploration, etc."
                 + "but not limited to these; feel free to pick any other topic as well. "
+                + "Plus, generate a title for the passage."
                 + "Also, when you pick from a broad category (e.g. culture), select a different specific subtopic each time for variety. "
                 + "Then create " + questionCount + " multiple-choice questions (4 options each) "
                 + "and provide a summary question prompt for the test taker to practice English writing. "
@@ -63,8 +85,10 @@ public class TaskGenerationService {
                 // + "Also include the correct label (\"A\", \"B\", \"C\", or \"D\") in the
                 // field \"answerLabel\". "
                 + "Incorrect options must be highly misleading unless the test taker fully understands the passage; for example, they may be generally true but not supported by the passage. "
-                + "Respond in JSON with keys: "
+                + "Adding " + difficulty + " as cefrLevel, respond in JSON with keys: "
+                + "\"title\" (string), "
                 + "\"passage\" (string), "
+                + "\"cefrLevel\" (string), "
                 + "\"mcqs\" (array of {question:string, options:[string], answerLabel:string}), "
                 + "\"summaryPrompt\" (string).";
 

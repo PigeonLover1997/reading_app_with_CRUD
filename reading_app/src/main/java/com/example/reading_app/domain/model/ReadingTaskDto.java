@@ -6,10 +6,20 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 // 問題生成用のDTOクラス
 public class ReadingTaskDto {
+    private String title; // 表題を追加
     private String passage; // 問題文
+    private String cefrLevel;  // 問題文のCEFRレベル
     private List<MCQDto> mcqs; // 選択式問題
     private String summaryPrompt; // 要約文の指示文
     // getter / setter
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getPassage() {
         return passage;
@@ -19,6 +29,13 @@ public class ReadingTaskDto {
         this.passage = passage;
     }
 
+    public String getCefrLevel() {
+        return cefrLevel;
+    }
+    public void setCefrLevel(String cefrLevel) {
+        this.cefrLevel = cefrLevel;
+    }
+    
     public List<MCQDto> getMcqs() {
         return mcqs;
     }

@@ -18,18 +18,62 @@
       display: inline-block;
       margin-right: 0.5em;
     }
+
+    /* 希望語数の補正表示用 */
+    .blue-link {
+      color: #0066cc;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .補正表エリア {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(.68,-0.55,.27,1.55);
+      background: #f5faff;
+      border-radius: 8px;
+      border: 1px solid #b6daf8;
+      margin: 10px 0 0 0;
+      padding: 0 12px;
+    }
+    .補正表エリア.open {
+      max-height: 350px;
+      padding: 12px;
+    }
+    table {
+      margin-left: 0; /* テーブルの左寄せ */ 
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.97em;
+      background: #fafdff;
+    }
+    th, td {
+      border: 1px solid #bddfff;
+      padding: 6px 12px;
+      text-align: left; /* 文字の左寄せ */
+    }
+    th {
+      background: #eaf5ff;
+    }
+
   </style>
 </head>
 
 <body>
   <h1>英語読解問題&要約問題ジェネレータ</h1>
-  <p>「問題を生成」ボタンを押下すると、下記に指定した希望条件で、問題文・選択式読解問題・英作文用の要約課題が生成されます。
+  <p>ページ最下部の「問題を生成」ボタンを押下すると、下記に指定した希望条件で、問題文・選択式読解問題・英作文用の要約課題が生成されます。
 <!-- 注意部分を網掛け -->
 <div style="background-color: #bffcff; padding: 10px; border-left: 4px solid #ccc; margin-top: 1em; margin-bottom: 1em;">
-  <strong>注意：</strong> AI（GPT-4.1 mini）を使用した自動生成のため、内容に誤りを含む場合があります。特に、AIの知識データにない題材（例えばマイナーな固有名詞や最近のニュースなど）をトピックに指定した場合、AIは内容を調べずに語感だけで創作記事を出力します。
-  <br />
-  また、希望条件に必ずしも沿うとは限らず、特に語数に関しては指定語数より若干少なめで作成される傾向があります。難易度についてもあくまで参考程度となります。
+  <strong>注意：</strong> AI（GPT-4.1 mini）を使用した自動生成のため、問題文の内容や、解答へのフィードバックや解説に誤りを含む場合があります。
+  <br />特に、AIの知識データにない題材（例えばマイナーな固有名詞や最近のニュースなど）をトピックに指定した場合、AIは内容を調べずに語感だけで創作記事を出力します。
+  <br />また、希望条件に必ずしも沿うとは限らず、難易度についてもあくまで参考程度となります。
 </div>
+<!-- メモ始まり -->
+<br><div style="background-color: #bffcff; padding: 10px; border-left: 4px solid #ccc; margin-top: 1em; margin-bottom: 1em;">
+  <strong>自分用メモ：ToDo 1 → 該当箇所&訳と解説の改行分離
+  <br>ToDo 2 → 文法フィードバックから、採点講評&文法語法フィードバックへの変更      
+  <br>ToDo 3 → 要約から英作文への変更（事前にバックアップを取る）</strong> 
+</div>
+<!-- メモ終わり -->
 
 <br />
   <form th:action="@{/generate}" method="post">
@@ -92,6 +136,50 @@
       </label>
     </div>
 
+    <div>
+    ※AIの仕組み上、指定よりも少なめの語数で英文が生成されることが多いため、内部的に
+    <span class="blue-link" id="correctionLink">語数に応じた補正</span>
+    をかけた状態でAIにリクエストを送っています。
+    <br />それでも語数が希望語数から大きくズレる（主に下回る）こともありますので、あくまでも目安と考えてください。
+    <br />また、自由入力で大きな値を指定しても、実質的な上限は700語前後となります。
+  </div>
+
+  <div class="補正表エリア" id="correctionTableArea">
+    <table>
+      <thead>
+        <tr>
+          <th>希望語数の指定</th>
+          <th>AIへの指示内容</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>～150</td>
+          <td>指定語数の <strong>0.9倍～1.1倍</strong> になるよう指示</td>
+        </tr>
+        <tr>
+          <td>151～300</td>
+          <td>指定語数の <strong>1.1倍～1.3倍</strong> になるよう指示</td>
+        </tr>
+        <tr>
+          <td>301～450</td>
+          <td>指定語数の <strong>1.3倍～1.5倍</strong> になるよう指示</td>
+        </tr>
+        <tr>
+          <td>451～600</td>
+          <td>指定語数の <strong>1.7倍～2.0倍</strong> になるよう指示</td>
+        </tr>
+        <tr>
+          <td>601～</td>
+          <td>指定語数の <strong>2.0倍～2.5倍</strong> になるよう指示</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="font-size:0.93em; color:#246">
+      ※希望語数が長いほど生成語数が不足する傾向にあるため補正を強めにしています。
+    </div>
+  </div>
+
     <!-- 問題数 -->
     <div class="field">
       <label>選択式問題の数:</label><br />
@@ -117,9 +205,16 @@
       <input type="text" id="topic" name="topic" placeholder="例: AIを活用した英語学習" />
       <br />空欄にした場合、ランダムなトピックが選ばれます。
     </div>
-
+  <!-- 注意部分を網掛け -->
+<div style="background-color: #ffedd1; padding: 10px; border-left: 4px solid #ccc; margin-top: 1em; margin-bottom: 1em;">
+  <strong>注意：</strong> OpenAIに対して、開発やサービス改善のため入出力内容を提供することでAIの利用料金を無料化しています。
+  <br><strong>個人情報や機密情報などをトピック欄や英作文解答欄に入力しないでください。</strong>
+  <br>データ提供にご同意いただいたうえでご利用ください。
+  <br>また、問題文の生成語数によりますが、ページ表示までに数十秒かかる場合があります。
+</div>
     <button type="submit">問題を生成</button>
   </form>
+
   <script>
     // ページロード時＆ラジオ選択時にカスタム欄の有効・無効を切り替える
     document.addEventListener('DOMContentLoaded', () => {
@@ -145,6 +240,15 @@
       }
       toggleQuesInput(); // 初期状態
     });
+
+    // 語数補正表の表示・非表示
+        const link = document.getElementById('correctionLink');
+    const area = document.getElementById('correctionTableArea');
+    link.addEventListener('click', () => {
+      area.classList.toggle('open');
+    });
+    // 初期状態で非表示
+    area.classList.remove('open');
   </script>
 </body>
 

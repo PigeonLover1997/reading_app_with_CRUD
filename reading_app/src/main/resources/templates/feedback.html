@@ -65,8 +65,8 @@
   <div class="flex-container">
     <!-- 左: 問題＋選択式結果 -->
     <div class="passage">
-      <h2>問題文</h2>
-      <p th:text="${task.passage}">パッセージ</p>
+      <h2><strong><em th:text="${task.title}">記事タイトル</em></strong></h2>
+      <p th:text="${task.passage}">ここに英語の長文が表示されます。</p>
       <div th:text="|(${feedback.passageWordCount} words)|"></div>
 
       <h2>選択式問題</h2>
@@ -124,5 +124,39 @@
   </div>
   <a th:href="@{/}">トップに戻る</a>
 </body>
+  <script>
+    // --- タイマー処理 ---
+    const timerEl = document.getElementById('timer');
+    const startTime = Date.now();
+    function updateTimer() {
+      const diff = Math.floor((Date.now() - startTime) / 1000);
+      const mm = String(Math.floor(diff / 60)).padStart(2, '0');
+      const ss = String(diff % 60).padStart(2, '0');
+      timerEl.textContent = `${mm}:${ss}`;
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
 
+    // --- 単語数カウント関数 ---
+    function countWords(text) {
+      const trimmed = text.trim();
+      return trimmed ? trimmed.split(/\s+/).length : 0;
+    }
+
+    // --- 問題文の語数表示 ---
+    window.addEventListener('load', () => {
+      const passageText = document.querySelector('.passage p').textContent;
+      const wc = countWords(passageText);
+      document.getElementById('passageWordCount')
+        .textContent = `(${wc} words)`;
+    });
+
+    // --- 要約テキストエリアの語数リアルタイムカウント ---
+    const summaryArea = document.getElementById('summaryAnswer');
+    const summaryCountEl = document.getElementById('summaryWordCount');
+    summaryArea.addEventListener('input', () => {
+      const wc = countWords(summaryArea.value);
+      summaryCountEl.textContent = `(words count: ${wc})`;
+    });
+  </script>
 </html>

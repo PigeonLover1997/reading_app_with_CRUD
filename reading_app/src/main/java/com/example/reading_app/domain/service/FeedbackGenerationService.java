@@ -39,19 +39,29 @@ public class FeedbackGenerationService {
 
     /**
      * ユーザーの解答を採点・フィードバック
-     * 
-     * @param task    元のTaskオブジェクト（passage, mcqs, summaryPrompt）
+     *
+     * @param task    元のTaskオブジェクト（title, difficulty, passage, mcqs, summaryPrompt）
      * @param answers 選択式回答のリスト (選択肢インデックス)
      * @param summary 要約文の自由入力
      * @return JSON文字列のまま返却し、Controllerにてパース
      */
     public FeedbackResultDto gradeAndFeedback(ReadingTaskDto task, List<String> answers, String summary) {
+        // 要約文採点時に使用する難易度情報
+        String cefrLevel = task.getCefrLevel();
+
         // システム指示
         String system = "You are an expert English teacher who teaches English to Japanese students. "
-                +"First, grade each multiple-choice answer: for each question, provide whether it's correct or not, and provide a justification section with the following format: 本文中の該当箇所: a direct quote from the passage that supports the correct answer in double quotes (Japanese translation of that part in parentheses)\n"
-                +"解説: (Explain clearly why the correct answer is correct, and why each incorrect option is incorrect, if applicable.). "
+                // +"You will be given the article's title, but use the title only for reference, and focus your grading and explanations mainly on the passage body and students' answers.\n"
+                // +"First, grade each multiple-choice answer: for each question, provide whether it's correct or not, and provide a justification section with the following format: 本文中の該当箇所: a direct quote from the passage that supports the correct answer in double quotes (Japanese translation of that part in parentheses)\n"
+                // +"解説: (Explain clearly why the correct answer is correct, and why each incorrect option is incorrect, if applicable.). "
+                 +"First, grade each multiple-choice answer: for each question, provide whether it's correct or not, and provide a justification section with the following format:\n"
+                +"本文中の該当箇所: ...（日本語訳）\n"
+                +"[改行を1回入れる]\n"
+                +"解説: ...（理由や他選択肢の解説も含めて）\n"
                 +"Then, evaluate the summary on three criteria (grammar, vocabulary range, content) on a 0-10 scale. 0: Not answered, 1-2: Poor, 3-4: Below Average, 5-6: Average, 7-8: Good, 9-10: Excellent. "
-                +"Also point out errors in grammar and usage, suggest corrections and why the original expression was incorrect, and finally show a couple of useful expressions from the passage that are useful for the student to use in writing or speaking, with Japanese explanation for each phrase. "
+                +"The task's difficulty level in CEFR is " + cefrLevel + ". "
+                +"When evaluating the summary, always take into account the CEFR level of the task. If the CEFR level is low (such as A1 or A2), award higher scores for the same level of content and English, but if the CEFR level is high (such as C1 or C2), apply stricter grading criteria. Adjust your grammar, vocabulary, and content scores according to the expected performance at each CEFR level.\n"
+                +"Also point out errors in grammar and word usage, suggest corrections and why the original expression was incorrect, and finally show a couple of useful expressions related to the passage that are useful for the student to use in writing or speaking, with Japanese explanation for each phrase. "
                 +"Respond entirely in Japanese because estimated test takers are Japanese people who learn English.\n"
                 +"Output JSON with keys:\n"
                 +"  mcqResults: [{questionIndex:int, correct:boolean, explanation:string}],\n"
@@ -110,6 +120,7 @@ public class FeedbackGenerationService {
     private String buildUserPayload(ReadingTaskDto task, List<String> answers, String summary) {
         StringBuilder sb = new StringBuilder();
         sb.append("タスク情報:\n");
+        sb.append("タイトル: ").append(task.getTitle()).append("\n");   // ←タイトルを追加
         sb.append("問題文: ").append(task.getPassage()).append("\n");
         for (int i = 0; i < task.getMcqs().size(); i++) {
             MCQDto m = task.getMcqs().get(i);
