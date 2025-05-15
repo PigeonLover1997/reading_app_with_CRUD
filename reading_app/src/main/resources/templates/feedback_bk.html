@@ -44,6 +44,7 @@
   <!-- 要約問題の採点 -->
   <section>
     <h2>要約問題の採点</h2>
+    （0:無回答 1-2:悪い 3-4:いまひとつ 5-6:普通 7-8:良い 9-10:とても良い）
     <ul>
       <li th:text="${'文法: ' + feedback.summaryScores.grammarScore + '/10'}"></li>
       <li th:text="${'語彙: ' + feedback.summaryScores.vocabScore + '/10'}"></li>
@@ -59,7 +60,7 @@
 
   <!-- おまけ表現 -->
   <section>
-    <h2>実践で使える表現</h2>
+    <h2>作文に便利な表現</h2>
     <ul th:each="phrase : ${feedback.usefulPhrases}">
       <li th:text="${phrase}"></li>
     </ul>

@@ -19,27 +19,36 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
-@SessionAttributes("task") // セッションにReadingTaskDtoを保持  問題採点時にも使用できるようにセッションに保存
+@SessionAttributes("task") // セッションにReadingTaskDtoを保持 問題採点時にも使用できるようにセッションに保存
 public class HomeController {
 
     @Autowired
     private TaskGenerationService taskService;
-    
+
     @Autowired
     private FeedbackGenerationService feedbackService;
 
     @Autowired
-    private ObjectMapper objectMapper;  // Jacksonのマッパーを注入
+    private ObjectMapper objectMapper; // Jacksonのマッパーを注入
 
     /** トップページ（フォーム入力画面） */
     @GetMapping("/")
     public String showForm(Model model) {
         // 難易度リスト
         model.addAttribute("levels", List.of("A1", "A2", "B1", "B2", "C1", "C2"));
+        // 難易度目安表示マップ
+        // Map<String, String> levelDescriptionMap = Map.of(
+        //         "A1", "A1 （目安：英検3級／TOEIC 300）",
+        //         "A2", "A2 （目安：英検準2級／TOEIC 450）",
+        //         "B1", "B1 （目安：英検2級／TOEIC 600）",
+        //         "B2", "B2 （目安：英検準1級／TOEIC 800）",
+        //         "C1", "C1 （目安：英検1級／TOEIC 950）",
+        //         "C2", "C2 （目安：英検1級+α／TOEIC 990+α）");
+        //model.addAttribute("levelDescriptionMap", levelDescriptionMap);
         // 語数のテンプレートリスト
-        model.addAttribute("defaultWordCounts", List.of(200, 300, 400, 500));
+        model.addAttribute("defaultWordCounts", List.of(100, 200, 300, 400, 500));
         // 問題数のテンプレートリスト
-        model.addAttribute("defaultQuestionCounts", List.of(1, 2, 3, 4));
+        model.addAttribute("defaultQuestionCounts", List.of(1, 2, 3, 4, 5));
         return "index";
     }
 
@@ -69,42 +78,39 @@ public class HomeController {
             topic = "";
 
         ReadingTaskDto task = taskService.generateTask(difficulty, wordCount, questionCount, topic);
-        model.addAttribute("task", task);  // セッションに保持される
+        model.addAttribute("task", task); // セッションに保持される
         return "taskPlay";
     }
 
-     /**
+    /**
      * taskPlay.html のフォームから POST される全回答を受け取り、
      * ChatGPT に採点依頼 → 解析 → feedback.html に渡す
      */
     @PostMapping("/submitAnswers")
     public String submitAnswers(
-            @ModelAttribute("task") ReadingTaskDto task,          // セッション or hidden で保持していた Task
-            @RequestParam("summaryAnswer") String summary,
-            @RequestParam Map<String, String> params,   // mcq_0, mcq_1, … をまとめて受け取る
-            Model model
-    ) throws Exception {
+            @ModelAttribute("task") ReadingTaskDto task, // セッション or hidden で保持していた Task
+            @RequestParam("summaryAnswer") String summaryAnswer,
+            @RequestParam Map<String, String> params, // mcq_0, mcq_1, … をまとめて受け取る
+            Model model) throws Exception {
         // 1) 選択式解答を A/B/C/D の文字列リストにまとめる
-        List<String> answers = new ArrayList<>();
+        List<String> userAnswers = new ArrayList<>();
         for (int i = 0; i < task.getMcqs().size(); i++) {
-            String key = "mcq_" + i;                    // フォーム側の name 属性に対応
+            String key = "mcq_" + i; // フォーム側の name 属性に対応
             String ans = params.get(key);
             if (ans == null) {
                 // 未選択時は空文字
                 ans = "";
             }
-            answers.add(ans);                           // 例: "A", "C", "B"…
+            userAnswers.add(ans); // 例: "A", "C", "B"…
         }
+        // 2) サービス呼び出し（JSON→DTO まで完結する想定）
+        FeedbackResultDto feedback = feedbackService.gradeAndFeedback(task, userAnswers, summaryAnswer);
 
-        // 2) ChatGPT に採点&フィードバックを依頼し、JSON 字列を取得
-        String feedbackJson = feedbackService.gradeAndFeedback(task, answers, summary);
-
-        // 3) ObjectMapper を使って FeedbackResult DTO に変換
-        ObjectMapper mapper = new ObjectMapper();
-        FeedbackResultDto result = mapper.readValue(feedbackJson, FeedbackResultDto.class);
-
-        // 4) Model に結果を詰めて feedback.html を返す
-        model.addAttribute("feedback", result);
+        // 3) View が参照する名前で model に登録
+        model.addAttribute("task", task);
+        model.addAttribute("userAnswers", userAnswers);
+        model.addAttribute("summaryAnswer", summaryAnswer);
+        model.addAttribute("feedback", feedback);
         return "feedback";
     }
 }

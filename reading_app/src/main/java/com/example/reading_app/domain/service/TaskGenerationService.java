@@ -42,18 +42,18 @@ public class TaskGenerationService {
      */
     public ReadingTaskDto generateTask(String difficulty, int wordCount, int questionCount, String topic) {
         // ① ChatGPT に与えるシステム指示
-        String systemPrompt = "You are an English teacher. "
+        String systemPrompt = "You are an expert English writer whose articles are famous for their interesting content. "
                 + "Generate an English reading passage of about " + wordCount + " words at CEFR level " + difficulty
                 + " on the topic '" + (topic.isBlank() ? "a random topic" : topic) + "'. "
                 + "If the topic is 'a random topic', choose one at random from a wide range, such as "
                 + "history, science, travel, culture, technology, nature, art, daily life, "
                 + "sports, health, environment, education, economics, fashion, psychology, "
                 + "architecture, literature, music, food, festivals, space exploration, politics, "
-                + "philosophy, transportation, wildlife conservation—"
+                + "philosophy, transportation etc."
                 + "but not limited to these; feel free to pick any other topic as well. "
                 + "Also, when you pick from a broad category (e.g. culture), select a different specific subtopic each time for variety. "
                 + "Then create " + questionCount + " multiple-choice questions (4 options each) "
-                + "and provide a summary question prompt. "
+                + "and provide a summary question prompt for the test taker to practice English writing. "
                 + "Even if the topic is given in Japanese, always generate the passage, multiple-choice questions and the summary question prompt in English. "
                 // + "For each multiple-choice question, the \"options\" array in the JSON must
                 // contain exactly four strings, "
@@ -62,7 +62,7 @@ public class TaskGenerationService {
                 // text. "
                 // + "Also include the correct label (\"A\", \"B\", \"C\", or \"D\") in the
                 // field \"answerLabel\". "
-                + "Incorrect options must be misleading unless the test taker fully understands the passage. "
+                + "Incorrect options must be highly misleading unless the test taker fully understands the passage; for example, they may be generally true but not supported by the passage. "
                 + "Respond in JSON with keys: "
                 + "\"passage\" (string), "
                 + "\"mcqs\" (array of {question:string, options:[string], answerLabel:string}), "

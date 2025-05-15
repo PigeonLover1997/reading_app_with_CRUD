@@ -10,62 +10,118 @@
       margin: 1em;
     }
 
-    .highlight {
-      background: #fffb91;
+    .flex-container {
+      display: flex;
+      gap: 1em;
+    }
+
+    .passage,
+    .questions {
+      border: 1px solid #ccc;
+      padding: 1em;
+      overflow-y: auto;
+    }
+
+    .passage {
+      flex: 1;
+      max-height: 80vh;
+    }
+
+    .questions {
+      flex: 1;
+      max-height: 80vh;
+    }
+
+    .mcq {
+      margin-bottom: 1em;
+    }
+
+    .mcq-options label {
+      display: block;
+    }
+
+    textarea[disabled],
+    input[type=radio][disabled]+span {
+      color: #666;
+    }
+
+    /* モバイルは上下 */
+    @media (max-width:768px) {
+      .flex-container {
+        flex-direction: column;
+      }
+
+      .passage,
+      .questions {
+        max-height: 40vh;
+      }
     }
   </style>
 </head>
 
 <body>
-  <h1>採点結果 & フィードバック</h1>
+  <h1>採点結果 ＆ フィードバック</h1>
 
-  <!-- 問題文 -->
-  <section>
-    <h2>問題文</h2>
-    <!-- highlight 済み HTML をそのまま描画 -->
-    <p th:utext="${feedback.highlightedPassage}"></p>
-    <!-- 単語数を展開 -->
-    <div th:text="|(${feedback.passageWordCount} words)|"></div>
-  </section>
+  <div class="flex-container">
+    <!-- 左: 問題＋選択式結果 -->
+    <div class="passage">
+      <h2>問題文</h2>
+      <p th:text="${task.passage}">パッセージ</p>
+      <div th:text="|(${feedback.passageWordCount} words)|"></div>
 
-  <!-- 選択式問題の結果 -->
-  <section>
-    <h2>選択式問題の結果</h2>
-    <div th:each="res : ${feedback.mcqResults}">
-      <p>
-        <!-- 正誤 -->
-        <span th:text="${res.correct} ? '正解' : '不正解'"></span>
-        <!-- 解説 -->
-        <span th:text="${res.explanation}"></span>
-      </p>
+      <h2>選択式問題</h2>
+      <div th:each="mcq,idxStat : ${task.mcqs}" class="mcq">
+        <p>
+          <!-- 修正箇所 -->
+          <strong th:text="${{idxStat.index + 1} + '. ' + mcq.question}">設問文</strong>
+        </p>
+
+        <div class="mcq-options" th:each="opt,optStat : ${mcq.options}">
+          <label>
+            <!-- ユーザーが選択したものだけ checked -->
+            <input type="radio" th:disabled="true"
+              th:checked="${userAnswers[idxStat.index] == 'ABCD'.substring(optStat.index, optStat.index+1)}" />
+            <span th:text="${'(' + 'ABCD'.substring(optStat.index, optStat.index+1) + ') ' + opt}" />
+          </label>
+        </div>
+
+        <!-- 正誤と解説 -->
+        <p>
+          <strong th:text="${feedback.mcqResults[idxStat.index].correct} ? '正解' : '不正解'">正誤</strong><br>
+          <span th:text="${feedback.mcqResults[idxStat.index].explanation}">解説</span>
+        </p>
+      </div>
     </div>
-  </section>
 
-  <!-- 要約問題の採点 -->
-  <section>
-    <h2>要約問題の採点</h2>
-    （0:無回答 1-2:悪い 3-4:いまひとつ 5-6:普通 7-8:良い 9-10:とても良い）
-    <ul>
-      <li th:text="${'文法: ' + feedback.summaryScores.grammarScore + '/10'}"></li>
-      <li th:text="${'語彙: ' + feedback.summaryScores.vocabScore + '/10'}"></li>
-      <li th:text="${'内容: ' + feedback.summaryScores.contentScore + '/10'}"></li>
-    </ul>
+    <!-- 右: 要約＋フィードバック -->
+    <div class="questions">
+      <h2>要約問題</h2>
+      <p th:text="${task.summaryPrompt}">要約指示</p>
+      <textarea rows="5" style="width:100%;" th:text="${summaryAnswer}" disabled></textarea>
 
-    <!-- 文法フィードバック -->
-    <h3>文法フィードバック</h3>
-    <ul th:each="e : ${feedback.grammarFeedback}">
-      <li th:text="|${e.grammarError} → ${e.correction}|"></li>
-    </ul>
-  </section>
+      <h2>要約の採点</h2>
+      （0:無回答 1-2:不十分 3-4:いまひとつ 5-6:そこそこ 7-8:良い 9-10:とても良い）
+      <ul>
+        <li th:text="${'文法: ' + feedback.summaryScores.grammarScore + '/10'}"></li>
+        <li th:text="${'語彙: ' + feedback.summaryScores.vocabScore + '/10'}"></li>
+        <li th:text="${'内容: ' + feedback.summaryScores.contentScore + '/10'}"></li>
+      </ul>
 
-  <!-- おまけ表現 -->
-  <section>
-    <h2>作文に便利な表現</h2>
-    <ul th:each="phrase : ${feedback.usefulPhrases}">
-      <li th:text="${phrase}"></li>
-    </ul>
-  </section>
+      <h3>文法フィードバック</h3>
+      <ul th:each="e : ${feedback.grammarFeedback}">
+        <li>
+          <span th:text='|（誤）"${e.grammarError}" → （正）"${e.correction}"|'></span><br />
+          <small th:text="${e.reason}">なぜ誤りか解説</small>
+        </li>
+      </ul>
 
+      <h3>作文に便利な表現</h3>
+      <ul th:each="p : ${feedback.usefulPhrases}">
+        <!-- フォーマット: English phrase（日本語）：使用場面 -->
+        <li th:text="${p}">phrase (意味)：アドバイス</li>
+      </ul>
+    </div>
+  </div>
   <a th:href="@{/}">トップに戻る</a>
 </body>
 

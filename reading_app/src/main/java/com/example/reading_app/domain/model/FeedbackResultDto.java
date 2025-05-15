@@ -60,6 +60,7 @@ public class FeedbackResultDto {
     public static class GrammarFeedback {
         private String grammarError;
         private String correction;
+        private String reason;
         // getter/setter
         public String getGrammarError() {
             return grammarError;
@@ -72,7 +73,13 @@ public class FeedbackResultDto {
         }
         public void setCorrection(String correction) {
             this.correction = correction;
+        }  
+        public String getReason() {
+            return reason;
         }
+        public void setReason(String reason) {
+            this.reason = reason;
+        }        
     }
 
     // ↑３つの DTO をネストで定義しましたが、必要なら別ファイルでも OK

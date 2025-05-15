@@ -22,26 +22,64 @@
 </head>
 
 <body>
-  <h1>英語読解問題ジェネレータ</h1>
+  <h1>英語読解問題&要約問題ジェネレータ</h1>
+  <p>「問題を生成」ボタンを押下すると、下記に指定した希望条件で、問題文・選択式読解問題・英作文用の要約課題が生成されます。
+<!-- 注意部分を網掛け -->
+<div style="background-color: #bffcff; padding: 10px; border-left: 4px solid #ccc; margin-top: 1em; margin-bottom: 1em;">
+  <strong>注意：</strong> AI（GPT-4.1 mini）を使用した自動生成のため、内容に誤りを含む場合があります。特に、AIの知識データにない題材（例えばマイナーな固有名詞や最近のニュースなど）をトピックに指定した場合、AIは内容を調べずに語感だけで創作記事を出力します。
+  <br />
+  また、希望条件に必ずしも沿うとは限らず、特に語数に関しては指定語数より若干少なめで作成される傾向があります。難易度についてもあくまで参考程度となります。
+</div>
+
+<br />
   <form th:action="@{/generate}" method="post">
     <!-- 難易度 -->
     <div class="field">
       <label>難易度 (CEFR):</label><br />
+      <!-- 難易度 (CEFR)および目安 -->
       <div th:each="lvl : ${levels}">
-        <label>
-          <input type="radio" name="difficulty" th:value="${lvl}" th:checked="${lvl=='B2'}" />
-          <span th:text="${lvl}">B2</span>
+        <!-- lvl の値で表示を切り替える -->
+        <label th:switch="${lvl}">
+          <input type="radio" name="difficulty" th:value="${lvl}" th:checked="${lvl=='A1'}" />
+
+          <!-- 各CEFRの場合に応じた難易度目安を表示 -->
+          <span th:case="'A1'">
+            A1  （目安：英検3級／TOEIC 300）
+          </span>
+          <span th:case="'A2'">
+            A2  （目安：英検準2級／TOEIC 450）
+          </span>
+          <span th:case="'B1'">
+            B1  （目安：英検2級／TOEIC 600）
+          </span>
+          <span th:case="'B2'">
+            B2  （目安：英検準1級／TOEIC 800）
+          </span>
+          <span th:case="'C1'">
+            C1  （目安：英検1級／TOEIC 950）
+          </span>
+          <span th:case="'C2'">
+            C2  （目安：英検1級+α／TOEIC 990+α）
+          </span>
+
+          <!-- どれにも当てはまらない場合（念のためのフォールバック） -->
+          <span th:case="*">
+            <span th:text="${lvl}">?</span>
+          </span>
         </label>
       </div>
     </div>
+    
+    <br>
 
-    <!-- 語数（目安） -->
+
+    <!-- 希望語数 -->
     <div class="field">
-      <label>語数（目安）:</label><br />
+      <label>希望語数:</label><br />
       <!-- テンプレートからリストを回す -->
       <div th:each="cnt : ${defaultWordCounts}">
         <label>
-          <input type="radio" name="wordCountRadio" th:value="${cnt}" th:checked="${cnt==200}" />
+          <input type="radio" name="wordCountRadio" th:value="${cnt}" th:checked="${cnt==100}" />
           <span th:text="${cnt}" />語
         </label>
       </div>
@@ -76,7 +114,8 @@
     <!-- トピック -->
     <div class="field">
       <label for="topic">トピック（任意）:</label><br />
-      <input type="text" id="topic" name="topic" placeholder="例: Environment" />
+      <input type="text" id="topic" name="topic" placeholder="例: AIを活用した英語学習" />
+      <br />空欄にした場合、ランダムなトピックが選ばれます。
     </div>
 
     <button type="submit">問題を生成</button>
