@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # --- Build Stage ---
-FROM eclipse-temurin:21-jdk AS build
+FROM gradle:8.4-jdk17 AS build
 WORKDIR /app
 
 # Copy Gradle wrapper and build scripts first for better caching
