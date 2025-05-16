@@ -1,18 +1,30 @@
-# buildステージ（Gradle版）
+#################################
+# １）ビルド用ステージ
+#################################
 FROM gradle:8.4-jdk17 AS build
+
+# 作業ディレクトリを /app にする
 WORKDIR /app
 
-# 依存だけ先にキャッシュ
-COPY reading_app/build.gradle reading_app/settings.gradle ./  
-RUN gradle clean assemble --no-daemon -x test
+# リポジトリ直下の reading_app フォルダを丸ごとコピー
+COPY reading_app/ .  
 
-# ソース一式をコピー
-COPY reading_app/src ./src
-RUN gradle bootJar --no-daemon
+# デバッグ用にファイル一覧を出力（あとでログで見られます）
+RUN ls -R /app
 
-# 実行ステージ
+# 実際にビルド
+RUN gradle clean build --no-daemon -x test
+
+#################################
+# ２）ランタイム用ステージ
+#################################
 FROM eclipse-temurin:17-jdk-jammy
+
 WORKDIR /app
+
+# ビルドステージから生成された jar をコピー
 COPY --from=build /app/build/libs/*.jar app.jar
+
 EXPOSE 8080
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
