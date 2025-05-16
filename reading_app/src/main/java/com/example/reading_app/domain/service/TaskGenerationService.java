@@ -9,6 +9,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+import com.example.reading_app.util.TopicPool; // ランダムトピック取得用
+
 /**
  * ChatGPT API を呼び出し、
  * ・指定 CEFR レベル・語数・トピック の長文読解パッセージ
@@ -37,7 +39,7 @@ public class TaskGenerationService {
      * @param difficulty    CEFR レベル ("A1"～"C2")
      * @param wordCount     パッセージの語数（おおよそ）
      * @param questionCount 選択式問題の数
-     * @param topic         トピック（空文字でランダム）
+     * @param topic         トピック（空文字の場合、TopicPoolクラスからランダムで取得）
      * @return ReadingTaskDto オブジェクト（問題文・タイトル・難易度・選択式問題リスト・英作文課題用プロンプトを含む）
      */
     public ReadingTaskDto generateTask(String difficulty, int wordCount, int questionCount, String topic) {
@@ -48,7 +50,7 @@ public class TaskGenerationService {
                 + "The passage should be in multiple paragraphs, using clear paragraph breaks. "
                 + "Insert a blank line (double line break) between paragraphs for readability, and begin each paragraph with two spaces for indentation. "
                 + "Generate an English reading passage at CEFR level " + difficulty
-                + " on the topic '" + (topic.isBlank() ? "a random topic" : topic) + "'. "
+                + " on the topic '" + (topic.isBlank() ? TopicPool.getRandomTopic() : topic) + "'. "
                 // 語数指定を確認  語数が多くなると指定より出力が少なくなる傾向があるので、指定語数に応じて補正をかける
                 + "Check the following designated word count: " + wordCount + ". "
                 // 語数指定が ～150の場合は、指定語数の 0.9倍～1.1 倍になるように指示
