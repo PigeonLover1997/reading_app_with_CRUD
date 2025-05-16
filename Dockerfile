@@ -1,41 +1,18 @@
-# syntax=docker/dockerfile:1
-
-# --- Build Stage ---
+# buildステージ（Gradle版）
 FROM gradle:8.4-jdk17 AS build
 WORKDIR /app
 
-# Copy Gradle wrapper and build scripts first for better caching
-COPY --link build.gradle settings.gradle gradlew ./
-COPY --link gradle ./gradle
+# 依存だけ先にキャッシュ
+COPY reading_app/build.gradle reading_app/settings.gradle ./  
+RUN gradle clean assemble --no-daemon -x test
 
-# Download dependencies (leverage Docker cache)
-RUN chmod +x gradlew && ./gradlew dependencies --no-daemon
+# ソース一式をコピー
+COPY reading_app/src ./src
+RUN gradle bootJar --no-daemon
 
-# Copy source code
-COPY --link src ./src
-
-# Build the application (skip tests for faster build)
-RUN ./gradlew build --no-daemon -x test
-
-# --- Runtime Stage ---
-FROM eclipse-temurin:21-jre
+# 実行ステージ
+FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
-
-# Create non-root user and group
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
-
-# Copy built jar from build stage
-COPY --from=build /app/build/libs/*.jar /app/app.jar
-
-# Set permissions
-RUN chown -R appuser:appgroup /app
-USER appuser
-
-# JVM options: container-aware memory, GC tuning
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=80.0 -XX:+UseContainerSupport"
-
-# Expose default Spring Boot port
+COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8080
-
-# Use exec form for proper signal handling
-ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
