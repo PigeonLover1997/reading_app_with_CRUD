@@ -56,18 +56,28 @@
         max-height: 40vh;
       }
     }
+
+    /* 語数表示・入力カウンタ */
+    #passageWordCount,
+    #compositionWordCount {
+      font-size: 0.8em;
+      color: #555;
+      margin-top: 0.5em;
+    }
   </style>
 </head>
 
 <body>
-  <h1>採点結果 ＆ フィードバック</h1>
+  <h1>採点結果 & フィードバック</h1>
 
   <div class="flex-container">
     <!-- 左: 問題＋選択式結果 -->
     <div class="passage">
       <h2><strong><em th:text="${task.title}">記事タイトル</em></strong></h2>
-      <p th:text="${task.passage}">ここに英語の長文が表示されます。</p>
-      <div th:text="|(${feedback.passageWordCount} words)|"></div>
+      <!-- <p th:text="${task.passage}">ここに英語の長文が表示されます。</p> -->
+      <div th:text="${task.passage}">ここに英語の長文が表示されます。</div>
+      <!-- <div id="passageWordCount">(0 words)</div> -->
+       <div id="passageWordCount" th:text="'(' + ${passageWordCount} + ' words)'">(0 words)</div>
 
       <h2>選択式問題</h2>
       <div th:each="mcq,idxStat : ${task.mcqs}" class="mcq">
@@ -95,24 +105,25 @@
       </div>
     </div>
 
-    <!-- 右: 要約＋フィードバック -->
+    <!-- 右: 英作文＋フィードバック -->
     <div class="questions">
-      <h2>要約問題</h2>
-      <p th:text="${task.summaryPrompt}">要約指示</p>
-      <textarea rows="5" style="width:100%;" th:text="${summaryAnswer}" disabled></textarea>
+      <h2>英作文問題</h2>
+      <p th:text="${task.compositionPrompt}">英作文指示</p>
+      <textarea rows="10" style="width:100%;" th:text="${compositionAnswer}" disabled></textarea>
 
-      <h2>要約の採点</h2>
-      （0:無回答 1-2:不十分 3-4:いまひとつ 5-6:そこそこ 7-8:良い 9-10:とても良い）
+      <h2>英作文の採点</h2>
+      （0:無回答　1-2:不十分　3-4:いまひとつ　5-6:そこそこ　7-8:良い　9-10:とても良い）
       <ul>
-        <li th:text="${'文法: ' + feedback.summaryScores.grammarScore + '/10'}"></li>
-        <li th:text="${'語彙: ' + feedback.summaryScores.vocabScore + '/10'}"></li>
-        <li th:text="${'内容: ' + feedback.summaryScores.contentScore + '/10'}"></li>
+        <li th:text="${'文法・語法: ' + feedback.compositionScores.grammarAndUsageScore + '/10'}"></li>
+        <li th:text="${'内容: ' + feedback.compositionScores.contentScore + '/10'}"></li>
+        <li th:text="${feedback.compositionScores.scoreCommentary}"></li>
       </ul>
+      
 
-      <h3>文法フィードバック</h3>
-      <ul th:each="e : ${feedback.grammarFeedback}">
+      <h3>文法・語法フィードバック</h3>
+      <ul th:each="e : ${feedback.grammarAndUsageFeedback}">
         <li>
-          <span th:text='|（誤）"${e.grammarError}" → （正）"${e.correction}"|'></span><br />
+          <span th:text='|（誤）"${e.grammarAndUsageError}" → （正）"${e.correction}"|'></span><br />
           <small th:text="${e.reason}">なぜ誤りか解説</small>
         </li>
       </ul>
@@ -126,39 +137,49 @@
   </div>
   <a th:href="@{/}">トップに戻る</a>
 </body>
-  <script>
-    // --- タイマー処理 ---
-    const timerEl = document.getElementById('timer');
-    const startTime = Date.now();
-    function updateTimer() {
-      const diff = Math.floor((Date.now() - startTime) / 1000);
-      const mm = String(Math.floor(diff / 60)).padStart(2, '0');
-      const ss = String(diff % 60).padStart(2, '0');
-      timerEl.textContent = `${mm}:${ss}`;
-    }
-    setInterval(updateTimer, 1000);
-    updateTimer();
+<script>
+  // --- タイマー処理 ---
+  const timerEl = document.getElementById('timer');
+  const startTime = Date.now();
+  function updateTimer() {
+    const diff = Math.floor((Date.now() - startTime) / 1000);
+    const mm = String(Math.floor(diff / 60)).padStart(2, '0');
+    const ss = String(diff % 60).padStart(2, '0');
+    timerEl.textContent = `${mm}:${ss}`;
+  }
+  setInterval(updateTimer, 1000);
+  updateTimer();
 
-    // --- 単語数カウント関数 ---
-    function countWords(text) {
-      const trimmed = text.trim();
-      return trimmed ? trimmed.split(/\s+/).length : 0;
-    }
+  // --- 単語数カウント関数 ---
+  function countWords(text) {
+    const trimmed = text.trim();
+    return trimmed ? trimmed.split(/\s+/).length : 0;
+  }
 
-    // --- 問題文の語数表示 ---
-    window.addEventListener('load', () => {
-      const passageText = document.querySelector('.passage p').textContent;
-      const wc = countWords(passageText);
-      document.getElementById('passageWordCount')
-        .textContent = `(${wc} words)`;
+  // --- 問題文の語数表示 ---
+  window.addEventListener('load', () => {
+    const passageDiv = document.querySelector('.passage');
+    let text = '';
+    passageDiv.childNodes.forEach(node => {
+      // nodeType 1: 要素, 3: テキストノード
+      if (node.nodeType === 1 && node.tagName !== 'H2') {
+        text += node.textContent + ' ';
+      }
+      if (node.nodeType === 3) {
+        text += node.textContent + ' ';
+      }
     });
+    const wc = countWords(text);
+    document.getElementById('passageWordCount').textContent = `(${wc} words)`;
+  });
 
-    // --- 要約テキストエリアの語数リアルタイムカウント ---
-    const summaryArea = document.getElementById('summaryAnswer');
-    const summaryCountEl = document.getElementById('summaryWordCount');
-    summaryArea.addEventListener('input', () => {
-      const wc = countWords(summaryArea.value);
-      summaryCountEl.textContent = `(words count: ${wc})`;
-    });
-  </script>
+  // --- 英作文テキストエリアの語数リアルタイムカウント ---
+  const compositionArea = document.getElementById('compositionAnswer');
+  const compositionCountEl = document.getElementById('compositionWordCount');
+  compositionArea.addEventListener('input', () => {
+    const wc = countWords(compositionArea.value);
+    compositionCountEl.textContent = `(words count: ${wc})`;
+  });
+</script>
+
 </html>

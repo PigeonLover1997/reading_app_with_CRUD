@@ -21,7 +21,7 @@
     }
 
     #timer {
-      position: absolute;
+      position: relative;
       top: 0;
       right: 0;
       font-size: 0.8em;
@@ -73,7 +73,7 @@
 
     /* 語数表示・入力カウンタ */
     #passageWordCount,
-    #summaryWordCount {
+    #compositionWordCount {
       font-size: 0.8em;
       color: #555;
       margin-top: 0.5em;
@@ -82,10 +82,9 @@
 </head>
 
 <body>
-  <!-- ヘッダー＋タイマー -->
+  <!-- ヘッダー -->
   <div class="header-container">
     <h1>出題ページ</h1>
-    <div id="timer">00:00</div>
   </div>
 
   <div class="flex-container">
@@ -96,9 +95,11 @@
       <div id="passageWordCount">(0 words)</div>
     </div>
 
-    <!-- 右: 選択式＋要約 -->
+    <!-- 右: 選択式＋英作文 -->
     <div class="questions">
       <form th:action="@{/submitAnswers}" method="post">
+        <!-- 隠しフィールドで、カウントした語数をフィードバック画面での表示用に送信しておく -->
+        <input type="hidden" id="passageWordCountInput" name="passageWordCount" value="0" />
         <!-- 選択式問題 -->
         <h2>選択式問題</h2>
         <div th:each="mcq,iterStat : ${task.mcqs}" class="mcq">
@@ -123,12 +124,13 @@
           </div>
         </div>
 
-        <!-- 要約問題 -->
-        <h2>要約問題</h2>
-        <p th:text="${task.summaryPrompt}">ここに要約問題の指示が表示されます。</p>
-        <textarea id="summaryAnswer" name="summaryAnswer" rows="5" style="width:100%;"></textarea>
-        <div id="summaryWordCount">(words count: 0)</div>
-
+        <!-- 英作文問題 -->
+        <h2>英作文問題</h2>
+        <p th:text="${task.compositionPrompt}">ここに英作文問題の指示が表示されます。</p>
+        <textarea id="compositionAnswer" name="compositionAnswer" rows="10" style="width:100%;"></textarea>
+        <div id="compositionWordCount">(words count: 0)</div>
+        <div id="timer">(time passed: 00:00)</div>
+        <br>
         <button type="submit">回答を送信</button>
       </form>
     </div>
@@ -142,7 +144,7 @@
       const diff = Math.floor((Date.now() - startTime) / 1000);
       const mm = String(Math.floor(diff / 60)).padStart(2, '0');
       const ss = String(diff % 60).padStart(2, '0');
-      timerEl.textContent = `${mm}:${ss}`;
+      timerEl.textContent = `(time passed: ${mm}:${ss})`;
     }
     setInterval(updateTimer, 1000);
     updateTimer();
@@ -154,19 +156,21 @@
     }
 
     // --- 問題文の語数表示 ---
-    window.addEventListener('load', () => {
-      const passageText = document.querySelector('.passage p').textContent;
-      const wc = countWords(passageText);
-      document.getElementById('passageWordCount')
-        .textContent = `(${wc} words)`;
-    });
+window.addEventListener('load', () => {
+  const passageText = document.querySelector('.passage p').textContent;
+  const wc = countWords(passageText);
+  document.getElementById('passageWordCount')
+    .textContent = `(${wc} words)`;
+  // フォーム送信用hiddenにもセット
+  document.getElementById('passageWordCountInput').value = wc;
+});
 
-    // --- 要約テキストエリアの語数リアルタイムカウント ---
-    const summaryArea = document.getElementById('summaryAnswer');
-    const summaryCountEl = document.getElementById('summaryWordCount');
-    summaryArea.addEventListener('input', () => {
-      const wc = countWords(summaryArea.value);
-      summaryCountEl.textContent = `(words count: ${wc})`;
+    // --- 英作文テキストエリアの語数リアルタイムカウント ---
+    const compositionArea = document.getElementById('compositionAnswer');
+    const compositionCountEl = document.getElementById('compositionWordCount');
+    compositionArea.addEventListener('input', () => {
+      const wc = countWords(compositionArea.value);
+      compositionCountEl.textContent = `(words count: ${wc})`;
     });
   </script>
 </body>

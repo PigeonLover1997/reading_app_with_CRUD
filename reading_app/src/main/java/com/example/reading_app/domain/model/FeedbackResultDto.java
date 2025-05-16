@@ -44,27 +44,20 @@ public class FeedbackResultDto {
         }
     }
 
-    // 要約のスコア
-    public static class SummaryScores {
-        private int grammarScore;
-        private int vocabScore;
+    // 英作文のスコアと講評
+    public static class CompositionScores {
+        private int grammarAndUsageScore;
         private int contentScore;
+        // ScoreCommentary は、スコアに応じた講評
+        private String scoreCommentary;
 
         // getter/setter
-        public int getGrammarScore() {
-            return grammarScore;
+        public int getGrammarAndUsageScore() {
+            return grammarAndUsageScore;
         }
 
-        public void setGrammarScore(int grammarScore) {
-            this.grammarScore = grammarScore;
-        }
-
-        public int getVocabScore() {
-            return vocabScore;
-        }
-
-        public void setVocabScore(int vocabScore) {
-            this.vocabScore = vocabScore;
+        public void setGrammarAndUsageScore(int grammarAndUsageScore) {
+            this.grammarAndUsageScore = grammarAndUsageScore;
         }
 
         public int getContentScore() {
@@ -73,22 +66,28 @@ public class FeedbackResultDto {
 
         public void setContentScore(int contentScore) {
             this.contentScore = contentScore;
+        }   
+        public String getScoreCommentary() {
+            return scoreCommentary;
+        }
+        public void setScoreCommentary(String scoreCommentary) {
+            this.scoreCommentary = scoreCommentary;
         }
     }
 
-    // 文法フィードバック（ミス箇所と修正案）
-    public static class GrammarFeedback {
-        private String grammarError;
+    // 文法・語法フィードバック（ミス箇所と修正案と理由）
+    public static class GrammarAndUsageFeedback {
+        private String grammarAndUsageError;
         private String correction;
         private String reason;
 
         // getter/setter
-        public String getGrammarError() {
-            return grammarError;
+        public String getGrammarAndUsageError() {
+            return grammarAndUsageError;
         }
 
-        public void setGrammarError(String grammarError) {
-            this.grammarError = grammarError;
+        public void setGrammarAndUsageError(String grammarAndUsageError) {
+            this.grammarAndUsageError = grammarAndUsageError;
         }
 
         public String getCorrection() {
@@ -111,8 +110,8 @@ public class FeedbackResultDto {
     // ↑３つの DTO をネストで定義しましたが、必要なら別ファイルでも OK
 
     private List<McqResult> mcqResults;
-    private SummaryScores summaryScores;
-    private List<GrammarFeedback> grammarFeedback;
+    private CompositionScores compositionScores;
+    private List<GrammarAndUsageFeedback> grammarAndUsageFeedback;
     private List<String> usefulPhrases;
     private String highlightedPassage; // 問題文のハイライト HTML
     private int passageWordCount;
@@ -122,12 +121,12 @@ public class FeedbackResultDto {
         return mcqResults;
     }
 
-    public SummaryScores getSummaryScores() {
-        return summaryScores;
+    public CompositionScores getCompositionScores() {
+        return compositionScores;
     }
 
-    public List<GrammarFeedback> getGrammarFeedback() {
-        return grammarFeedback;
+    public List<GrammarAndUsageFeedback> getGrammarAndUsageFeedback() {
+        return grammarAndUsageFeedback;
     }
 
     public List<String> getUsefulPhrases() {
@@ -146,12 +145,12 @@ public class FeedbackResultDto {
         this.mcqResults = mcqResults;
     }
 
-    public void setSummaryScores(SummaryScores summaryScores) {
-        this.summaryScores = summaryScores;
+    public void setCompositionScores(CompositionScores compositionScores) {
+        this.compositionScores = compositionScores;
     }
 
-    public void setGrammarFeedback(List<GrammarFeedback> grammarFeedback) {
-        this.grammarFeedback = grammarFeedback;
+    public void setGrammarAndUsageFeedback(List<GrammarAndUsageFeedback> grammarAndUsageFeedback) {
+        this.grammarAndUsageFeedback = grammarAndUsageFeedback;
     }
 
     public void setUsefulPhrases(List<String> usefulPhrases) {

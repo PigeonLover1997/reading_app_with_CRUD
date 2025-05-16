@@ -7,7 +7,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.reading_app.domain.model.FeedbackResultDto;
@@ -36,15 +35,6 @@ public class HomeController {
     public String showForm(Model model) {
         // 難易度リスト
         model.addAttribute("levels", List.of("A1", "A2", "B1", "B2", "C1", "C2"));
-        // 難易度目安表示マップ
-        // Map<String, String> levelDescriptionMap = Map.of(
-        //         "A1", "A1 （目安：英検3級／TOEIC 300）",
-        //         "A2", "A2 （目安：英検準2級／TOEIC 450）",
-        //         "B1", "B1 （目安：英検2級／TOEIC 600）",
-        //         "B2", "B2 （目安：英検準1級／TOEIC 800）",
-        //         "C1", "C1 （目安：英検1級／TOEIC 950）",
-        //         "C2", "C2 （目安：英検1級+α／TOEIC 990+α）");
-        //model.addAttribute("levelDescriptionMap", levelDescriptionMap);
         // 語数のテンプレートリスト
         model.addAttribute("defaultWordCounts", List.of(100, 200, 300, 400, 500));
         // 問題数のテンプレートリスト
@@ -89,8 +79,9 @@ public class HomeController {
     @PostMapping("/submitAnswers")
     public String submitAnswers(
             @ModelAttribute("task") ReadingTaskDto task, // セッション or hidden で保持していた Task
-            @RequestParam("summaryAnswer") String summaryAnswer,
+            @RequestParam("compositionAnswer") String compositionAnswer,
             @RequestParam Map<String, String> params, // mcq_0, mcq_1, … をまとめて受け取る
+            @RequestParam("passageWordCount") int passageWordCount, // 課題文の語数
             Model model) throws Exception {
         // 1) 選択式解答を A/B/C/D の文字列リストにまとめる
         List<String> userAnswers = new ArrayList<>();
@@ -104,12 +95,13 @@ public class HomeController {
             userAnswers.add(ans); // 例: "A", "C", "B"…
         }
         // 2) サービス呼び出し（JSON→DTO まで完結する想定）
-        FeedbackResultDto feedback = feedbackService.gradeAndFeedback(task, userAnswers, summaryAnswer);
+        FeedbackResultDto feedback = feedbackService.gradeAndFeedback(task, userAnswers, compositionAnswer);
 
         // 3) View が参照する名前で model に登録
+        model.addAttribute("passageWordCount", passageWordCount); // 課題文の語数
         model.addAttribute("task", task);
         model.addAttribute("userAnswers", userAnswers);
-        model.addAttribute("summaryAnswer", summaryAnswer);
+        model.addAttribute("compositionAnswer", compositionAnswer);
         model.addAttribute("feedback", feedback);
         return "feedback";
     }

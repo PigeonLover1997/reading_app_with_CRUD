@@ -10,7 +10,7 @@ public class ReadingTaskDto {
     private String passage; // 問題文
     private String cefrLevel;  // 問題文のCEFRレベル
     private List<MCQDto> mcqs; // 選択式問題
-    private String summaryPrompt; // 要約文の指示文
+    private String compositionPrompt; // 英作文の指示文
     // getter / setter
 
     public String getTitle() {
@@ -44,12 +44,11 @@ public class ReadingTaskDto {
         this.mcqs = mcqs;
     }
 
-    public String getSummaryPrompt() {
-        return summaryPrompt;
+    public void setCompositionPrompt(String compositionPrompt) {
+        this.compositionPrompt = compositionPrompt;
     }
-
-    public void setSummaryPrompt(String summaryPrompt) {
-        this.summaryPrompt = summaryPrompt;
+        public String getCompositionPrompt() {
+        return compositionPrompt;
     }
 
     // セッションにまだ task が無い初回アクセス時にも空の ReadingTaskDto が用意されるようにする

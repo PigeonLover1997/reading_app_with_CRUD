@@ -18,9 +18,9 @@ public class FeedbackGenerationService {
     /**
      * OpenAI API を利用して、ユーザーの解答を採点・フィードバックするサービス
      * 
-     * @param task    元のReadingTaskDtoオブジェクト（passage, mcqs, summaryPrompt）
+     * @param task    元のReadingTaskDtoオブジェクト（passage, mcqs, compositionPrompt）
      * @param answers 選択式回答のリスト (選択肢インデックス)
-     * @param summary 要約文の自由入力
+     * @param composition 英作文の自由入力
      * @return JSON文字列のまま返却し、Controllerにてパース
      */
 @Autowired
@@ -40,13 +40,13 @@ public class FeedbackGenerationService {
     /**
      * ユーザーの解答を採点・フィードバック
      *
-     * @param task    元のTaskオブジェクト（title, difficulty, passage, mcqs, summaryPrompt）
+     * @param task    元のTaskオブジェクト（title, difficulty, passage, mcqs, compositionPrompt）
      * @param answers 選択式回答のリスト (選択肢インデックス)
-     * @param summary 要約文の自由入力
+     * @param composition 英作文の自由入力
      * @return JSON文字列のまま返却し、Controllerにてパース
      */
-    public FeedbackResultDto gradeAndFeedback(ReadingTaskDto task, List<String> answers, String summary) {
-        // 要約文採点時に使用する難易度情報
+    public FeedbackResultDto gradeAndFeedback(ReadingTaskDto task, List<String> answers, String composition) {
+        // 英作文採点時に使用する難易度情報
         String cefrLevel = task.getCefrLevel();
 
         // システム指示
@@ -54,16 +54,17 @@ public class FeedbackGenerationService {
                 // +"You will be given the article's title, but use the title only for reference, and focus your grading and explanations mainly on the passage body and students' answers.\n"
                 +"First, grade each multiple-choice answer: for each question, provide whether it's correct or not, and provide a justification section with the following format: 本文中の該当箇所: a direct quote from the passage that supports the correct answer in double quotes as the evidence (Japanese translation of that part in parentheses)\n"
                 +"解説: (Clear explanation of why the correct answer is correct, and why each incorrect option is incorrect, if applicable.). "
-                +"Then, evaluate the summary on three criteria (grammar, vocabulary range, content) on a 0-10 scale. 0: Not answered, 1-2: Poor, 3-4: Below Average, 5-6: Average, 7-8: Good, 9-10: Excellent. "
+                +"Then, evaluate the student's English composition on two criteria (grammar and appropriate word usage, content) on a 0-10 scale. 0: Not answered, 1-2: Poor, 3-4: Below Average, 5-6: Average, 7-8: Good, 9-10: Excellent. "
+                +"Describe why you gave that score, and overall feedback as the score commentary. "
                 +"The task's difficulty level in CEFR is " + cefrLevel + ". "
-                +"When evaluating the summary, always take into account the CEFR level of the task. If the CEFR level is low (such as A1 or A2), award higher scores for the same level of content and English, but if the CEFR level is high (such as C1 or C2), apply stricter grading criteria. Adjust your grammar, vocabulary, and content scores according to the expected performance at each CEFR level.\n"
-                +"Also, DO NOT refer to the multiple-choice answers. The summary grading must be based ONLY on the user's summary answer and the passage.\n"
+                +"When evaluating the English composition, always take into account the CEFR level of the task. If the CEFR level is low (such as A1 or A2), award higher scores for the same level of content and English, but if the CEFR level is high (such as C1 or C2), apply stricter grading criteria. Adjust your grammar and word usage score and content scores according to the expected performance at each CEFR level.\n" 
+                +"Also, DO NOT refer to the multiple-choice answers. The English composition grading must be based on how well the student's writing answers the English composition task.\n"
                 +"Also point out errors in grammar and word usage, suggest corrections and why the original expression was incorrect, and finally show a couple of useful expressions related to the passage that are useful for the student to use in writing or speaking, with Japanese explanation for each phrase. "
                 +"Respond entirely in Japanese because estimated test takers are Japanese people who learn English.\n"
                 +"Respond in JSON with keys as follows:\n"
                 +"  mcqResults: [{questionIndex:int, correct:boolean, evidence:string, explanation:string}],\n"
-                +"  summaryScores: {grammarScore:int, vocabScore:int, contentScore:int},\n"
-                +"  grammarFeedback: [{grammarError:string, correction:string, reason:string}],\n"
+                +"  compositionScores: {grammarAndUsageScore:int, contentScore:int, scoreCommentary:string},\n"
+                +"  grammarAndUsageFeedback: [{grammarAndUsageError:string, correction:string, reason:string}],\n"
                 +"  usefulPhrases: [string]";
 
         // 構造化リクエスト
@@ -80,7 +81,7 @@ public class FeedbackGenerationService {
         // - "role":"user" でユーザー発話を示す
         userMsg.put("role", "user");
         // - buildUserPayload() で「問題文+解答」を一つの文字列にまとめる
-        userMsg.put("content", buildUserPayload(task, answers, summary));
+        userMsg.put("content", buildUserPayload(task, answers, composition));
         messages.add(userMsg);
         // ④ body に messages をセット
         body.put("messages", messages);
@@ -114,7 +115,7 @@ public class FeedbackGenerationService {
      * 
      * @param answers 選択肢の「A」「B」「C」「D」などの文字列リスト
      */
-    private String buildUserPayload(ReadingTaskDto task, List<String> answers, String summary) {
+    private String buildUserPayload(ReadingTaskDto task, List<String> answers, String composition) {
         StringBuilder sb = new StringBuilder();
         sb.append("タスク情報:\n");
         sb.append("タイトル: ").append(task.getTitle()).append("\n");   // ←タイトルを追加
@@ -132,7 +133,7 @@ public class FeedbackGenerationService {
             // ユーザー回答も文字列そのまま
             sb.append("あなたの回答: ").append(answers.get(i)).append("\n");
         }
-        sb.append("要約: ").append(summary);
+        sb.append("英作文: ").append(composition);
         return sb.toString();
     }
 }

@@ -13,7 +13,7 @@ import java.util.*;
  * ChatGPT API を呼び出し、
  * ・指定 CEFR レベル・語数・トピック の長文読解パッセージ
  * ・指定数の選択式問題（4 選択肢＋正解インデックス）
- * ・要約問題用のプロンプト
+ * ・英作文問題用の指示文
  * をまとめて生成し、Java オブジェクトとして返すサービス
  */
 @Service
@@ -38,7 +38,7 @@ public class TaskGenerationService {
      * @param wordCount     パッセージの語数（おおよそ）
      * @param questionCount 選択式問題の数
      * @param topic         トピック（空文字でランダム）
-     * @return ReadingTaskDto オブジェクト（問題文・タイトル・難易度・選択式問題リスト・要約課題用プロンプトを含む）
+     * @return ReadingTaskDto オブジェクト（問題文・タイトル・難易度・選択式問題リスト・英作文課題用プロンプトを含む）
      */
     public ReadingTaskDto generateTask(String difficulty, int wordCount, int questionCount, String topic) {
 
@@ -75,22 +75,15 @@ public class TaskGenerationService {
                 + "Plus, generate a title for the passage."
                 + "Also, when you pick from a broad category (e.g. culture), select a different specific subtopic each time for variety. "
                 + "Then create " + questionCount + " multiple-choice questions (4 options each) "
-                + "and provide a summary question prompt for the test taker to practice English writing. "
-                + "Even if the topic is given in Japanese, always generate the passage, multiple-choice questions and the summary question prompt in English. "
-                // + "For each multiple-choice question, the \"options\" array in the JSON must
-                // contain exactly four strings, "
-                // + "each prefixed with its label in parentheses: "
-                // + "first option text, second option text, third option text, fourth option
-                // text. "
-                // + "Also include the correct label (\"A\", \"B\", \"C\", or \"D\") in the
-                // field \"answerLabel\". "
+                + "and provide a prompt for the test taker to practice English writing composition, based on the contents of the passage and appropriate difficulty for an English learner whose goal is at CEFR level " + difficulty
+                + "Even if the topic is given in Japanese, always generate the passage, multiple-choice questions and the composition prompt in English. "
                 + "Incorrect options must be highly misleading unless the test taker fully understands the passage; for example, they may be generally true but not supported by the passage. "
                 + "Adding " + difficulty + " as cefrLevel, respond in JSON with keys: "
                 + "\"title\" (string), "
                 + "\"passage\" (string), "
                 + "\"cefrLevel\" (string), "
                 + "\"mcqs\" (array of {question:string, options:[string], answerLabel:string}), "
-                + "\"summaryPrompt\" (string).";
+                + "\"compositionPrompt\" (string).";
 
         // ② リクエストボディを構築
         Map<String, Object> body = new HashMap<>();
