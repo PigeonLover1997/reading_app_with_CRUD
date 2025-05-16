@@ -87,8 +87,10 @@
 
         <!-- 正誤と解説 -->
         <p>
-          <strong th:text="${feedback.mcqResults[idxStat.index].correct} ? '正解' : '不正解'">正誤</strong><br>
-          <span th:text="${feedback.mcqResults[idxStat.index].explanation}">解説</span>
+          <strong th:text="${feedback.mcqResults[idxStat.index].correct} ? '正解' : '不正解'">正誤</strong>
+          <br><span th:text="|本文の該当箇所： ${feedback.mcqResults[idxStat.index].evidence}|">本文の該当箇所：本文の該当箇所</span>
+          <br>
+          <br><span th:text="|解説： ${feedback.mcqResults[idxStat.index].explanation}|">解説：解説文</span>
         </p>
       </div>
     </div>

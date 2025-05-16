@@ -7,23 +7,38 @@ public class FeedbackResultDto {
     public static class McqResult {
         private int questionIndex;
         private boolean correct;
-        private String explanation;
+        private String evidence; // ← 本文中の該当箇所（引用＋和訳）
+        private String explanation; // ← 理由や解説（なぜ正解か・誤答解説など）
         // getter/setter
+
         public int getQuestionIndex() {
             return questionIndex;
         }
+
         public void setQuestionIndex(int questionIndex) {
             this.questionIndex = questionIndex;
         }
+
         public boolean isCorrect() {
             return correct;
         }
+
         public void setCorrect(boolean correct) {
             this.correct = correct;
         }
+
+        public String getEvidence() {
+            return evidence;
+        }
+
+        public void setEvidence(String evidence) {
+            this.evidence = evidence;
+        }
+
         public String getExplanation() {
             return explanation;
         }
+
         public void setExplanation(String explanation) {
             this.explanation = explanation;
         }
@@ -34,13 +49,16 @@ public class FeedbackResultDto {
         private int grammarScore;
         private int vocabScore;
         private int contentScore;
+
         // getter/setter
         public int getGrammarScore() {
             return grammarScore;
         }
+
         public void setGrammarScore(int grammarScore) {
             this.grammarScore = grammarScore;
         }
+
         public int getVocabScore() {
             return vocabScore;
         }
@@ -48,9 +66,11 @@ public class FeedbackResultDto {
         public void setVocabScore(int vocabScore) {
             this.vocabScore = vocabScore;
         }
+
         public int getContentScore() {
             return contentScore;
         }
+
         public void setContentScore(int contentScore) {
             this.contentScore = contentScore;
         }
@@ -61,25 +81,31 @@ public class FeedbackResultDto {
         private String grammarError;
         private String correction;
         private String reason;
+
         // getter/setter
         public String getGrammarError() {
             return grammarError;
         }
+
         public void setGrammarError(String grammarError) {
             this.grammarError = grammarError;
         }
+
         public String getCorrection() {
             return correction;
         }
+
         public void setCorrection(String correction) {
             this.correction = correction;
-        }  
+        }
+
         public String getReason() {
             return reason;
         }
+
         public void setReason(String reason) {
             this.reason = reason;
-        }        
+        }
     }
 
     // ↑３つの DTO をネストで定義しましたが、必要なら別ファイルでも OK
@@ -88,7 +114,7 @@ public class FeedbackResultDto {
     private SummaryScores summaryScores;
     private List<GrammarFeedback> grammarFeedback;
     private List<String> usefulPhrases;
-    private String highlightedPassage;  // 問題文のハイライト HTML
+    private String highlightedPassage; // 問題文のハイライト HTML
     private int passageWordCount;
 
     // getter/setter
@@ -115,6 +141,7 @@ public class FeedbackResultDto {
     public int getPassageWordCount() {
         return passageWordCount;
     }
+
     public void setMcqResults(List<McqResult> mcqResults) {
         this.mcqResults = mcqResults;
     }
@@ -137,5 +164,5 @@ public class FeedbackResultDto {
 
     public void setPassageWordCount(int passageWordCount) {
         this.passageWordCount = passageWordCount;
-    }  
+    }
 }
