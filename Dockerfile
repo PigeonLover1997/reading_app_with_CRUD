@@ -1,7 +1,7 @@
 #################################
 # １）ビルド用ステージ
 #################################
-FROM gradle:8.4-jdk17 AS build
+FROM gradle:8.4-jdk21 AS build
 
 # 作業ディレクトリを /app にする
 WORKDIR /app
@@ -18,7 +18,7 @@ RUN gradle clean build --no-daemon -x test
 #################################
 # ２）ランタイム用ステージ
 #################################
-FROM eclipse-temurin:17-jdk-jammy
+FROM eclipse-temurin:21-jdk-jammy
 
 WORKDIR /app
 
