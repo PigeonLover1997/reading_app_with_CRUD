@@ -1,0 +1,18 @@
+services:
+  java-reading_app:
+    build:
+      context: ./reading_app
+      dockerfile: ../Dockerfile  # Dockerfile is at project root
+    container_name: java-reading_app
+    ports:
+      - "8080:8080"  # Expose Spring Boot default port
+    restart: unless-stopped
+    init: true
+    networks:
+      - reading_app_net
+    # env_file: ./reading_app/.env  # Uncomment if .env file exists
+    # Add environment: block here if you have required non-secret variables
+
+networks:
+  reading_app_net:
+    driver: bridge

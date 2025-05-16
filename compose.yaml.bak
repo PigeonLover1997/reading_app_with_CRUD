@@ -1,0 +1,19 @@
+services:
+  java-reading_app:
+    build:
+      context: ./reading_app
+      dockerfile: ./Dockerfile
+    container_name: java-reading_app
+    restart: unless-stopped
+    init: true
+    ports:
+      - "8080:8080"  # Exposes the default Spring Boot port
+    # env_file: ./reading_app/.env  # Uncomment if .env file exists
+    # Add depends_on here if you add external services (e.g., databases)
+    networks:
+      - reading_app_net
+
+# Define a dedicated network for inter-service communication
+networks:
+  reading_app_net:
+    driver: bridge

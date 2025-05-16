@@ -1,0 +1,67 @@
+# Version control
+.git/
+.gitignore
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build outputs and artifacts
+build/
+bin/
+out/
+dist/
+
+# Java build artifacts
+*.class
+target/
+
+# Gradle
+.gradle/
+
+# Test sources and results
+src/test/
+
+# Logs and debug
+*.log
+debug/
+
+# Temporary and cache files
+tmp/
+temp/
+*.tmp
+
+# Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+config.local.*
+*.local.yml
+
+# Documentation
+*.md
+README*
+
+# Docker and compose files
+Dockerfile*
+docker-compose*
+
+# Miscellaneous
+local/
+.local/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Exclude gradlew and gradlew.bat from ignore (they are needed for builds)
+!gradlew
+!gradlew.bat
+
+# Exclude gradle-wrapper.jar and gradle-wrapper.properties (needed for builds)
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
