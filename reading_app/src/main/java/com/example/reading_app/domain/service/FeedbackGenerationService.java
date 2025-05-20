@@ -32,7 +32,7 @@ public class FeedbackGenerationService {
     @Value("${openai.api.key}")
     private String apiKey;
 
-    @Value("${openai.model}")
+    @Value("${openai.api.model}")
     private String model;
 
     private final RestTemplate rest = new RestTemplate();

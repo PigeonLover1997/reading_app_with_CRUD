@@ -39,5 +39,4 @@ out/
 # Secrets
 *.key
 *.pem
-MyAPIKey.txt
 src/main/resources/application.properties

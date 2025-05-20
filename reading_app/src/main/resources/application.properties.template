@@ -1,0 +1,12 @@
+# アプリケーションの設定ファイル
+# Spring Bootのプロパティファイル形式
+
+# application.propertiesはセキュリティの関係で.gitignoreによりGitHubにアップロードされないので、
+# GitHubからチェックアウトした際は以下の内容を使ってapplication.propertiesを作成する
+
+# OpenAI APIエンドポイント
+openai.api.url=https://api.openai.com/v1/chat/completions
+# 使用するモデル（このプロジェクトではGPT-4.1-miniを使用）
+openai.api.model=gpt-4.1-mini
+# APIキー（セキュリティ上、通常は環境変数か外部ファイルで管理推奨）
+openai.api.key=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
