@@ -67,10 +67,18 @@
     /* ラジオボタンをスマホだけ大きくする */
 @media (max-width: 768px) { 
   input[type="radio"] {
-    transform: scale(1.5);
+    transform: scale(1.25);
     margin-right: 6px; /* テキストとの間の余白も調整（任意） */
     vertical-align: middle; /* 縦位置も調整（任意） */
   }
+}
+
+/* 自由入力欄 */
+.free-word-input {
+  /* 半角文字12文字分くらいの幅 */
+  width: 12ch;
+  /* padding／border を含めた幅にしたい場合は box-sizing を追加 */
+  box-sizing: border-box;
 }
   </style>
 </head>
@@ -155,7 +163,7 @@
       <label>
         <input type="radio" name="wordCountRadio" value="0" />
         自由入力：
-        <input type="number" name="customWordCount" min="1" placeholder="希望語数" />
+        <input type="number" name="customWordCount" min="1" max="2000" placeholder="希望語数" class="free-word-input" />
         語
       </label>
     </div>
@@ -218,7 +226,7 @@
       <label>
         <input type="radio" name="questionCountRadio" value="0" />
         自由入力：
-        <input type="number" name="customQuestionCount" min="1" placeholder="希望問題数" />
+        <input type="number" name="customQuestionCount" min="1" max="10" placeholder="希望問題数"  class="free-word-input" />
         問
       </label>
     </div>

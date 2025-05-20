@@ -6,6 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>採点結果 & フィードバック</title>
   <style>
+    /* 線がはみ出るのを防止する用 どの要素にも適用 */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+    
     body {
       font-family: sans-serif;
       margin: 1em;
@@ -87,12 +94,21 @@
     /* ラジオボタンをスマホだけ大きくする */
     @media (max-width: 768px) {
       input[type="radio"] {
-        transform: scale(1.5);
+        transform: scale(1.25);
         margin-right: 6px;
         /* テキストとの間の余白も調整（任意） */
         vertical-align: middle;
         /* 縦位置も調整（任意） */
       }
+    }
+
+    /* ヘッダー部分のレイアウト */
+    h1 {
+      margin-top: 0em;
+      margin-bottom: 0.5em;
+      padding-top: 0;
+      padding-bottom: 0;
+      font-size: 1em;  /* サイズも控えめにしたい場合 */
     }
   </style>
 </head>
@@ -104,11 +120,13 @@
     <!-- 左: 問題＋選択式結果 -->
     <div class="passage">
       <h2><strong><em th:text="${task.title}">記事タイトル</em></strong></h2>
-      <!-- <p th:text="${task.passage}">ここに英語の長文が表示されます。</p> -->
       <div th:text="${task.passage}">ここに英語の長文が表示されます。</div>
-      <!-- <div id="passageWordCount">(0 words)</div> -->
       <div id="passageWordCount" th:text="'(' + ${passageWordCount} + ' words)'">(0 words)</div>
+    </div>
 
+    <!-- 右: 英作文＋フィードバック -->
+    <div class="questions">
+      
       <h2>選択式問題</h2>
       <div th:each="mcq,idxStat : ${task.mcqs}" class="mcq">
         <p>
@@ -133,10 +151,7 @@
           <br><span th:text="|解説： ${feedback.mcqResults[idxStat.index].explanation}|">解説：解説文</span>
         </p>
       </div>
-    </div>
 
-    <!-- 右: 英作文＋フィードバック -->
-    <div class="questions">
       <h2>英作文問題</h2>
       <p th:text="${task.compositionPrompt}">英作文指示</p>
       <textarea rows="10" style="width:100%;" th:text="${compositionAnswer}" disabled></textarea>
@@ -160,7 +175,7 @@
 
       <h3>作文に便利な表現</h3>
       <ul th:each="p : ${feedback.usefulPhrases}">
-        <!-- フォーマット: English phrase（日本語）：使用場面 -->
+        <!-- フォーマット: English phrase（日本語）：使用場面など -->
         <li th:text="${p}">phrase (意味)：アドバイス</li>
       </ul>
     </div>
