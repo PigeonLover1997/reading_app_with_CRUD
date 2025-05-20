@@ -6,6 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>採点結果 & フィードバック</title>
   <style>
+    /* 線がはみ出るのを防止する用 どの要素にも適用 */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+    
     body {
       font-family: sans-serif;
       margin: 1em;
@@ -87,7 +94,7 @@
     /* ラジオボタンをスマホだけ大きくする */
     @media (max-width: 768px) {
       input[type="radio"] {
-        transform: scale(1.5);
+        transform: scale(1.25);
         margin-right: 6px;
         /* テキストとの間の余白も調整（任意） */
         vertical-align: middle;
