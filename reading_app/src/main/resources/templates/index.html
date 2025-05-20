@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>問題生成フォーム</title>
   <style>
     body {
@@ -25,50 +26,67 @@
       text-decoration: underline;
       cursor: pointer;
     }
+
     .補正表エリア {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.5s cubic-bezier(.68,-0.55,.27,1.55);
+      transition: max-height 0.5s cubic-bezier(.68, -0.55, .27, 1.55);
       background: #f5faff;
       border-radius: 8px;
       border: 1px solid #b6daf8;
       margin: 10px 0 0 0;
       padding: 0 12px;
     }
+
     .補正表エリア.open {
       max-height: 350px;
       padding: 12px;
     }
+
     table {
-      margin-left: 0; /* テーブルの左寄せ */ 
+      margin-left: 0;
+      /* テーブルの左寄せ */
       border-collapse: collapse;
       width: 100%;
       font-size: 0.97em;
       background: #fafdff;
     }
-    th, td {
+
+    th,
+    td {
       border: 1px solid #bddfff;
       padding: 6px 12px;
-      text-align: left; /* 文字の左寄せ */
+      text-align: left;
+      /* 文字の左寄せ */
     }
+
     th {
       background: #eaf5ff;
     }
 
+    /* ラジオボタンをスマホだけ大きくする */
+@media (max-width: 768px) { 
+  input[type="radio"] {
+    transform: scale(1.5);
+    margin-right: 6px; /* テキストとの間の余白も調整（任意） */
+    vertical-align: middle; /* 縦位置も調整（任意） */
+  }
+}
   </style>
 </head>
 
 <body>
   <h1>英語読解問題&英作文問題ジェネレータ</h1>
   <p>ページ最下部の「問題を生成」ボタンを押下すると、下記に指定した希望条件で、問題文・選択式読解問題・英作文問題が生成されます。
-<!-- 注意部分を網掛け -->
-<div style="background-color: #bffcff; padding: 10px; border-left: 4px solid #ccc; margin-top: 1em; margin-bottom: 1em;">
-  <strong>注意：</strong> AI（GPT-4.1 mini）を使用した自動生成のため、問題文の内容や、解答へのフィードバックや解説に誤りを含む場合があります。
-  <br />特に、AIの知識データにない題材（例えばマイナーな固有名詞や最近のニュースなど）をトピックに指定した場合、AIは内容を調べずに語感だけで創作記事を出力します。
-  <br />また、希望条件に必ずしも沿うとは限らず、難易度についてもあくまで参考程度となります。
-</div>
+    <!-- 注意部分を網掛け -->
+  <div
+    style="background-color: #bffcff; padding: 10px; border-left: 4px solid #ccc; margin-top: 1em; margin-bottom: 1em;">
+    <strong>注意：</strong> AI（GPT-4.1 mini）を使用した自動生成のため、問題文の内容や、解答へのフィードバックや解説に誤りを含む場合があります。
+    <br />特に、AIの知識データにない題材（例えばマイナーな固有名詞や最近のニュースなど）をトピックに指定した場合、AIは内容を調べずに語感だけで創作記事を出力します。
+    <br />また、希望条件に必ずしも沿うとは限らず、難易度についてもあくまで参考程度となります。
+  </div>
 
-<br />
+  <br />
   <form th:action="@{/generate}" method="post">
     <!-- 難易度 -->
     <div class="field">
@@ -80,23 +98,29 @@
           <input type="radio" name="difficulty" th:value="${lvl}" th:checked="${lvl=='A1'}" />
 
           <!-- 各CEFRの場合に応じた難易度目安を表示 -->
+          <span th:case="'Below A1'">
+            入門（目安：英検5～4級）
+          </span>
           <span th:case="'A1'">
-            A1  （目安：英検3級／TOEIC 300）
+            A1 （目安：英検3級／TOEIC 300）
           </span>
           <span th:case="'A2'">
-            A2  （目安：英検準2級／TOEIC 450）
+            A2 （目安：英検準2級／TOEIC 450）
           </span>
           <span th:case="'B1'">
-            B1  （目安：英検2級／TOEIC 600）
+            B1 （目安：英検2級／TOEIC 600）
           </span>
           <span th:case="'B2'">
-            B2  （目安：英検準1級／TOEIC 800）
+            B2 （目安：英検準1級／TOEIC 800）
           </span>
           <span th:case="'C1'">
-            C1  （目安：英検1級／TOEIC 950）
+            C1 （目安：英検1級／TOEIC 950）
           </span>
           <span th:case="'C2'">
-            C2  （目安：英検1級+α／TOEIC 990+α）
+            C2 （目安：英検1級+α／TOEIC 990+α）
+          </span>
+          <span th:case="'Over C2'">
+            超上級（目安：英語ネイティブの大人でも難しい）
           </span>
 
           <!-- どれにも当てはまらない場合（念のためのフォールバック） -->
@@ -106,14 +130,14 @@
         </label>
       </div>
       <!-- 難易度ごとのサンプルへのリンク -->
-       <br>
+      <br>
       <div style="margin-top:10px;">
-  <a href="/passagesLevelSampleList.html" target="_blank" style="font-size:0.95em;">
-    難易度ごとの英文サンプル（別ページ）
-  </a>
-</div>
+        <a href="/passagesLevelSampleList.html" target="_blank" style="font-size:0.95em;">
+          難易度ごとの英文サンプル（別ページ）
+        </a>
+      </div>
     </div>
-    
+
     <br>
 
 
@@ -123,7 +147,7 @@
       <!-- テンプレートからリストを回す -->
       <div th:each="cnt : ${defaultWordCounts}">
         <label>
-          <input type="radio" name="wordCountRadio" th:value="${cnt}" th:checked="${cnt==100}" />
+          <input type="radio" name="wordCountRadio" th:value="${cnt}" th:checked="${cnt==200}" />
           <span th:text="${cnt}" />語
         </label>
       </div>
@@ -137,48 +161,48 @@
     </div>
 
     <div>
-    ※AIの仕組み上、指定よりも少なめの語数で英文が生成されることが多いため、内部的に
-    <span class="blue-link" id="correctionLink">語数に応じた補正</span>
-    をかけた状態でAIにリクエストを送っています。
-    <br />それでも語数が希望語数から大きくズレる（主に下回る）こともありますので、あくまでも目安と考えてください。
-    <br />また、自由入力で大きな値を指定しても、実質的な上限は700語前後となります。
-  </div>
-
-  <div class="補正表エリア" id="correctionTableArea">
-    <table>
-      <thead>
-        <tr>
-          <th>希望語数の指定</th>
-          <th>AIへの指示内容</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>～150</td>
-          <td>指定語数の <strong>0.9倍～1.1倍</strong> になるよう指示</td>
-        </tr>
-        <tr>
-          <td>151～300</td>
-          <td>指定語数の <strong>1.1倍～1.3倍</strong> になるよう指示</td>
-        </tr>
-        <tr>
-          <td>301～450</td>
-          <td>指定語数の <strong>1.3倍～1.5倍</strong> になるよう指示</td>
-        </tr>
-        <tr>
-          <td>451～600</td>
-          <td>指定語数の <strong>1.7倍～2.0倍</strong> になるよう指示</td>
-        </tr>
-        <tr>
-          <td>601～</td>
-          <td>指定語数の <strong>2.0倍～2.5倍</strong> になるよう指示</td>
-        </tr>
-      </tbody>
-    </table>
-    <div style="font-size:0.93em; color:#246">
-      ※希望語数が長いほど生成語数が不足する傾向にあるため補正を強めにしています。
+      ※AIの仕組み上、指定よりも少なめの語数で英文が生成されることが多いため、内部的に
+      <span class="blue-link" id="correctionLink">語数に応じた補正</span>
+      をかけた状態でAIにリクエストを送っています。
+      <br />それでも語数が希望語数から大きくズレる（主に下回る）こともありますので、あくまでも目安と考えてください。
+      <br />また、自由入力で大きな値を指定しても、実質的な上限は700語前後となります。
     </div>
-  </div>
+
+    <div class="補正表エリア" id="correctionTableArea">
+      <table>
+        <thead>
+          <tr>
+            <th>希望語数の指定</th>
+            <th>AIへの指示内容</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>～150</td>
+            <td>指定語数の <strong>0.9倍～1.1倍</strong> になるよう指示</td>
+          </tr>
+          <tr>
+            <td>151～300</td>
+            <td>指定語数の <strong>1.1倍～1.3倍</strong> になるよう指示</td>
+          </tr>
+          <tr>
+            <td>301～450</td>
+            <td>指定語数の <strong>1.3倍～1.5倍</strong> になるよう指示</td>
+          </tr>
+          <tr>
+            <td>451～600</td>
+            <td>指定語数の <strong>1.7倍～2.0倍</strong> になるよう指示</td>
+          </tr>
+          <tr>
+            <td>601～</td>
+            <td>指定語数の <strong>2.0倍～2.5倍</strong> になるよう指示</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="font-size:0.93em; color:#246">
+        ※希望語数が長いほど生成語数が不足する傾向にあるため補正を強めにしています。
+      </div>
+    </div>
 
     <!-- 問題数 -->
     <div class="field">
@@ -186,7 +210,7 @@
       <!-- テンプレートからリストを回す -->
       <div th:each="num : ${defaultQuestionCounts}">
         <label>
-          <input type="radio" name="questionCountRadio" th:value="${num}" th:checked="${num==1}" />
+          <input type="radio" name="questionCountRadio" th:value="${num}" th:checked="${num==2}" />
           <span th:text="${num}" />問
         </label>
       </div>
@@ -205,13 +229,14 @@
       <input type="text" id="topic" name="topic" placeholder="例: AIを活用した英語学習" />
       <br />空欄にした場合、ランダムなトピックが選ばれます。
     </div>
-  <!-- 注意部分を網掛け -->
-<div style="background-color: #ffedd1; padding: 10px; border-left: 4px solid #ccc; margin-top: 1em; margin-bottom: 1em;">
-  <strong>注意：</strong> OpenAIに対して、開発やサービス改善のため入出力内容を提供することでAIの利用料金を無料化しています。
-  <br><strong>個人情報や機密情報などをトピック欄や英作文解答欄に入力しないでください。</strong>
-  <br>データ提供にご同意いただいたうえでご利用ください。
-  <br>また、問題文の生成語数によりますが、ボタン押下からページ表示までに数十秒かかる場合があります。
-</div>
+    <!-- 注意部分を網掛け -->
+    <div
+      style="background-color: #ffedd1; padding: 10px; border-left: 4px solid #ccc; margin-top: 1em; margin-bottom: 1em;">
+      <strong>注意：</strong> OpenAIに対して、開発やサービス改善のため入出力内容を提供することでAIの利用料金を無料化しています。
+      <br><strong>個人情報や機密情報などをトピック欄や英作文解答欄に入力しないでください。</strong>
+      <br>データ提供にご同意いただいたうえでご利用ください。
+      <br>また、問題文の生成語数によりますが、ボタン押下からページ表示までに数十秒かかる場合があります。
+    </div>
     <button type="submit">問題を生成</button>
   </form>
 
@@ -242,7 +267,7 @@
     });
 
     // 語数補正表の表示・非表示
-        const link = document.getElementById('correctionLink');
+    const link = document.getElementById('correctionLink');
     const area = document.getElementById('correctionTableArea');
     link.addEventListener('click', () => {
       area.classList.toggle('open');

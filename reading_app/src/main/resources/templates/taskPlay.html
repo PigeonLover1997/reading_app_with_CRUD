@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>出題ページ</title>
   <style>
     body {
@@ -51,16 +52,33 @@
       max-height: 80vh;
     }
 
-    /* タブレット用？のレスポンシブデザイン */
-    /*media (max-width: 768px) {*/
-    @media (max-width: 300px) { /* スマホ用 */
+    /* デフォルトはPC想定：左右並び */
+    .flex-container {
+      display: flex;
+      gap: 1em;
+      flex-direction: row;
+    }
+
+    .passage,
+    .questions {
+      flex: 1 1 50%;
+      max-height: 80vh;
+    }
+
+    /* スマホ（768px以下）では縦並びに */
+    @media (max-width: 768px) {
       .flex-container {
         flex-direction: column;
       }
 
       .passage,
       .questions {
+        flex: none;
+        /* 幅固定を解除 */
+        width: 100%;
+        /* 横幅いっぱい */
         max-height: 40vh;
+        /* お好みで調整 */
       }
     }
 
@@ -79,6 +97,17 @@
       font-size: 0.8em;
       color: #555;
       margin-top: 0.5em;
+    }
+
+    /* ラジオボタンをスマホだけ大きくする */
+    @media (max-width: 768px) {
+      input[type="radio"] {
+        transform: scale(1.5);
+        margin-right: 6px;
+        /* テキストとの間の余白も調整（任意） */
+        vertical-align: middle;
+        /* 縦位置も調整（任意） */
+      }
     }
   </style>
 </head>
@@ -112,16 +141,12 @@
           </p>
           <div class="mcq-options" th:each="opt,optStat : ${mcq.options}">
             <label>
-              <input
-      type="radio"
-      th:name="${'mcq_' + iterStat.index}"
-      th:value="${'ABCD'.substring(optStat.index, optStat.index + 1)}"
-      required
-    />
-    <!-- ラベルはここで付与 -->
-    <span th:text="${'(' + 'ABCD'.substring(optStat.index, optStat.index + 1) + ') ' + opt}"/>
-    <!-- <span th:text="${'(' + 'ABCD'.substring(optStat.index, optStat.index + 1) + ') ' + opt}"> -->
-    </span>
+              <input type="radio" th:name="${'mcq_' + iterStat.index}"
+                th:value="${'ABCD'.substring(optStat.index, optStat.index + 1)}" required />
+              <!-- ラベルはここで付与 -->
+              <span th:text="${'(' + 'ABCD'.substring(optStat.index, optStat.index + 1) + ') ' + opt}" />
+              <!-- <span th:text="${'(' + 'ABCD'.substring(optStat.index, optStat.index + 1) + ') ' + opt}"> -->
+              </span>
             </label>
           </div>
         </div>
@@ -158,14 +183,14 @@
     }
 
     // --- 問題文の語数表示 ---
-window.addEventListener('load', () => {
-  const passageText = document.querySelector('.passage p').textContent;
-  const wc = countWords(passageText);
-  document.getElementById('passageWordCount')
-    .textContent = `(${wc} words)`;
-  // フォーム送信用hiddenにもセット
-  document.getElementById('passageWordCountInput').value = wc;
-});
+    window.addEventListener('load', () => {
+      const passageText = document.querySelector('.passage p').textContent;
+      const wc = countWords(passageText);
+      document.getElementById('passageWordCount')
+        .textContent = `(${wc} words)`;
+      // フォーム送信用hiddenにもセット
+      document.getElementById('passageWordCountInput').value = wc;
+    });
 
     // --- 英作文テキストエリアの語数リアルタイムカウント ---
     const compositionArea = document.getElementById('compositionAnswer');

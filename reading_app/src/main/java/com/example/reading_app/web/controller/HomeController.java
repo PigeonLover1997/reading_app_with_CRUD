@@ -34,7 +34,7 @@ public class HomeController {
     @GetMapping("/")
     public String showForm(Model model) {
         // 難易度リスト
-        model.addAttribute("levels", List.of("A1", "A2", "B1", "B2", "C1", "C2"));
+        model.addAttribute("levels", List.of("Below A1", "A1", "A2", "B1", "B2", "C1", "C2", "Over C2"));
         // 語数のテンプレートリスト
         model.addAttribute("defaultWordCounts", List.of(100, 200, 300, 400, 500));
         // 問題数のテンプレートリスト

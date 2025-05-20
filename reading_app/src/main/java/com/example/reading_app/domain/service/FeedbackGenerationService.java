@@ -51,7 +51,6 @@ public class FeedbackGenerationService {
 
         // システム指示
         String system = "You are an expert English teacher who teaches English to Japanese students. "
-                // +"You will be given the article's title, but use the title only for reference, and focus your grading and explanations mainly on the passage body and students' answers.\n"
                 +"First, grade each multiple-choice answer: for each question, provide whether it's correct or not, and provide a justification section with the following format: 本文中の該当箇所: a direct quote from the passage that supports the correct answer in double quotes as the evidence (Japanese translation of that part in parentheses)\n"
                 +"解説: (Clear explanation of why the correct answer is correct, and why each incorrect option is incorrect, if applicable.). "
                 +"Then, evaluate the student's English composition on two criteria (grammar and appropriate word usage, content) on a 0-10 scale. 0: Not answered, 1-2: Poor, 3-4: Below Average, 5-6: Average, 7-8: Good, 9-10: Excellent. "
