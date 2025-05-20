@@ -14,7 +14,6 @@ import com.example.reading_app.domain.model.ReadingTaskDto;
 import com.example.reading_app.domain.service.FeedbackGenerationService;
 import com.example.reading_app.domain.service.TaskGenerationService;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
