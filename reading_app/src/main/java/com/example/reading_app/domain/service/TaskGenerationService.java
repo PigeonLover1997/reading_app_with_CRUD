@@ -51,6 +51,8 @@ public class TaskGenerationService {
                 + "Insert a blank line (double line break) between paragraphs for readability, and begin each paragraph with two spaces for indentation. "
                 + "Generate an English reading passage at CEFR level " + difficulty
                 + " on the topic '" + (topic.isBlank() ? TopicPool.getRandomTopic() : topic) + "'. "
+                + "When you are instructed to do \"Below A1\" level, use extremely easy English words and basic grammar, and short simple sentences for beginner level English learners who are not ready for CEFL A1 level. "
+                + "When you are instructed to do \"Over C2\" level, use syntax so absurdly complex and vocabulary so arcane that even well-educated, native English-speaking adults would struggle to understand it. "
                 // 語数指定を確認  語数が多くなると指定より出力が少なくなる傾向があるので、指定語数に応じて補正をかける
                 + "Check the following designated word count: " + wordCount + ". "
                 // 語数指定が ～150の場合は、指定語数の 0.9倍～1.1 倍になるように指示
@@ -69,15 +71,12 @@ public class TaskGenerationService {
                 + "Else if the designated word count is 601 or more, the passage **must have between "
                 + (int) (wordCount * 2.0) + " and " + (int) (wordCount * 2.5) + " English words**. "
                 + "Use the following method to count words: count the number of sequences that match the regular expression \\b\\w+\\b in the passage. "
-                + "If the topic is 'a random topic', choose one at random from a wide range, such as "
-                + "history, science, travel, culture, technology, nature, art, daily life, "
-                + "sports, health, environment, education, economics, philosophy, psychology, "
-                + "architecture, literature, music, food, festivals, space exploration, etc."
-                + "but not limited to these; feel free to pick any other topic as well. "
                 + "Plus, generate a title for the passage."
                 + "Also, when you pick from a broad category (e.g. culture), select a different specific subtopic each time for variety. "
                 + "Then create " + questionCount + " multiple-choice questions (4 options each) "
                 + "and provide a prompt for the test taker to practice English writing composition, based on the contents of the passage and appropriate difficulty for an English learner whose goal is at CEFR level " + difficulty
+                + "When you are instructed to make two or more questions, make the first one vocabulary inference quiz(e.g. The word/phrase \"difficult word or phrase from the passage\" is closest in meaning to:) . "
+                + "When you are instructed to make only one question, prefer other types of question. "
                 + "Even if the topic is given in Japanese, always generate the passage, multiple-choice questions and the composition prompt in English. "
                 + "Incorrect options must be highly misleading unless the test taker fully understands the passage; for example, they may be generally true but not supported by the passage. "
                 + "Adding " + difficulty + " as cefrLevel, respond in JSON with keys: "
