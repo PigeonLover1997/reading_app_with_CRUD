@@ -36,7 +36,7 @@ public class TaskGenerationService {
     /**
      * ユーザー指定のパラメータでタスクを生成
      *
-     * @param difficulty    CEFR レベル ("A1"～"C2")
+     * @param difficulty    CEFR レベル ("Below A1"～"Over C2")
      * @param wordCount     パッセージの語数（おおよそ）
      * @param questionCount 選択式問題の数
      * @param topic         トピック（空文字の場合、TopicPoolクラスからランダムで取得）
