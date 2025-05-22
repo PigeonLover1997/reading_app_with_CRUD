@@ -1,2 +1,28 @@
-<!-- ログインページ -->
- テスト
+<!-- templates/login.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>ログイン</title>
+</head>
+<body>
+    <h2>ログイン</h2>
+    <form th:action="@{/login}" method="post">
+        <div>
+            <label>ユーザー名:
+                <input type="text" name="username" required />
+            </label>
+        </div>
+        <div>
+            <label>パスワード:
+                <input type="password" name="password" required />
+            </label>
+        </div>
+        <button type="submit">ログイン</button>
+    </form>
+    <!-- ログインエラーやログアウト時の表示 -->
+    <p th:if="${param.error}" style="color:red;">ユーザー名またはパスワードが違います</p>
+    <p th:if="${param.logout}" style="color:green;">ログアウトしました</p>
+    <p><a th:href="@{/register}">ユーザー登録はこちら</a></p>
+    <p><a th:href="@{/}">ゲスト用トップページへ</a></p>
+</body>
+</html>

@@ -45,6 +45,9 @@ dependencies {
 	// Flyway 本体 + PostgreSQL 追加モジュール
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.flywaydb:flyway-database-postgresql'
+
+	// Spring Securityの導入・設定
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 }
 
 tasks.named('test') {

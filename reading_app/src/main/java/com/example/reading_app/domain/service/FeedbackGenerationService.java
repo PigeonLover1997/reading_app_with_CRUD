@@ -6,9 +6,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.reading_app.domain.model.FeedbackResultDto;
-import com.example.reading_app.domain.model.MCQDto;
-import com.example.reading_app.domain.model.ReadingTaskDto;
+import com.example.reading_app.domain.model.dto.FeedbackResultDto;
+import com.example.reading_app.domain.model.dto.MCQDto;
+import com.example.reading_app.domain.model.dto.ReadingTaskDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.*;

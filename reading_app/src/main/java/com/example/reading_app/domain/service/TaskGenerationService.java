@@ -1,6 +1,5 @@
 package com.example.reading_app.domain.service;
 
-import com.example.reading_app.domain.model.ReadingTaskDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -9,6 +8,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+import com.example.reading_app.domain.model.dto.ReadingTaskDto;
 import com.example.reading_app.util.TopicPool; // ランダムトピック取得用
 
 /**

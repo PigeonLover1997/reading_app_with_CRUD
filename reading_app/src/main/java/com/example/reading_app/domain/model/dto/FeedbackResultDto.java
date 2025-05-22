@@ -1,4 +1,4 @@
-package com.example.reading_app.domain.model;
+package com.example.reading_app.domain.model.dto;
 
 import java.util.List;
 

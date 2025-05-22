@@ -1,5 +1,6 @@
 package com.example.reading_app.web.controller;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.reading_app.domain.model.FeedbackResultDto;
-import com.example.reading_app.domain.model.ReadingTaskDto;
+import com.example.reading_app.domain.model.dto.FeedbackResultDto;
+import com.example.reading_app.domain.model.dto.ReadingTaskDto;
 import com.example.reading_app.domain.service.FeedbackGenerationService;
 import com.example.reading_app.domain.service.TaskGenerationService;
 
@@ -29,9 +30,9 @@ public class HomeController {
     @Autowired
     private ObjectMapper objectMapper; // Jacksonのマッパーを注入
 
-    /** トップページ（フォーム入力画面） */
+    /** ゲスト用トップページ（フォーム入力画面） */
     @GetMapping("/")
-    public String showForm(Model model) {
+    public String showGuestHome(Model model) {
         // 難易度リスト
         model.addAttribute("levels", List.of("Below A1", "A1", "A2", "B1", "B2", "C1", "C2", "Over C2"));
         // 語数のテンプレートリスト
@@ -41,9 +42,25 @@ public class HomeController {
         return "index";
     }
 
+    /** ユーザー用トップページ（ログイン後のフォーム入力画面）（内容は基本的にはゲストと同じ）*/
+    @GetMapping("/user/home")
+    // java.security.Principalは現在認証されているユーザーを表し、Spring Securityでは、自動的に現在のログインユーザーをこのPrincipal型で受け取れる
+    public String showUserHome(Model model, Principal principal) {
+        // 難易度リスト
+        model.addAttribute("levels", List.of("Below A1", "A1", "A2", "B1", "B2", "C1", "C2", "Over C2"));
+        // 語数のテンプレートリスト
+        model.addAttribute("defaultWordCounts", List.of(100, 200, 300, 400, 500));
+        // 問題数のテンプレートリスト
+        model.addAttribute("defaultQuestionCounts", List.of(1, 2, 3, 4, 5));
+
+        // principal.getName()でユーザー名を取得し、登録
+        model.addAttribute("username", principal.getName());
+        return "user_home";
+    }
+
     /**
      * フォーム送信後に呼ばれる
-     * 各種パラメータを受け取り Task を生成 → taskPlay.html へ遷移
+     * 各種パラメータを受け取り Task を生成 → task_play.html へ遷移
      */
     @PostMapping("/generate")
     public String generateTask(
@@ -68,11 +85,11 @@ public class HomeController {
 
         ReadingTaskDto task = taskService.generateTask(difficulty, wordCount, questionCount, topic);
         model.addAttribute("task", task); // セッションに保持される
-        return "taskPlay";
+        return "task_play";
     }
 
     /**
-     * taskPlay.html のフォームから POST される全回答を受け取り、
+     * task_play.html のフォームから POST される全回答を受け取り、
      * ChatGPT に採点依頼 → 解析 → feedback.html に渡す
      */
     @PostMapping("/submitAnswers")

@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ゲスト用トップページ</title>
+  <title>ユーザー用トップページ</title>
+  <!-- 基本的にはゲスト用トップページと同じ ログインボタンなし、ログインユーザ表示などが異なる -->
   <style>
     body {
       font-family: sans-serif;
@@ -94,22 +95,12 @@
     <br />また、希望条件に必ずしも沿うとは限らず、難易度についてもあくまで参考程度となります。
   </div>
 
-    <!-- ログアウトで遷移してきたときの表示 -->
-    <p th:if="${param.logout}" style="color:green;">ログアウトしました</p>
+  <!-- Spring Securityの「/logout」はGETではなくPOSTでアクセスするのが推奨されている（セキュリティ強化のため） -->
+  <form th:action="@{/logout}" method="post" style="display:inline;">
+    <button type="submit">ログアウト</button>
+  </form>
 
-  <div style="margin-bottom: 1.5em; display: flex; gap: 1em;">
-    <form th:action="@{/login}" method="get" style="display:inline;">
-      <button type="submit">ログイン</button>
-    </form>
-    <form th:action="@{/register}" method="get" style="display:inline;">
-      <button type="submit">ユーザー作成</button>
-    </form>
-  </div>
-
-
-  <div>
-  ログインせずにゲストのまま利用することもできます。（問題の作成・解答履歴は保存されません）
-  </div>
+   <p>ログインしています。ユーザー名：<span th:text="${username}"></span></p>
 
   <br />
   <form th:action="@{/generate}" method="post">

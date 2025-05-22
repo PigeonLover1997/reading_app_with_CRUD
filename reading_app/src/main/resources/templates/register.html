@@ -1,0 +1,13 @@
+<!-- 登録フォーム -->
+<form th:action="@{/register}" method="post" th:object="${userForm}">
+    <div>
+        <label>ユーザー名: <input type="text" th:field="*{username}" required></label>
+    </div>
+    <div>
+        <label>パスワード: <input type="password" th:field="*{password}" required></label>
+    </div>
+    <button type="submit">登録</button>
+</form>
+<!-- エラーメッセージ -->
+<!-- ${error}が存在する場合のみ表示　現在はユーザー名重複の場合のみ -->
+<p th:if="${error}" th:text="${error}"></p>
