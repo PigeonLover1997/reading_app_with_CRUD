@@ -1,0 +1,29 @@
+# Docker Compose での PostgreSQL 構築用
+
+# 起動コマンド：docker-compose up -d
+# 接続確認（ローカルに psql が入っていれば）：
+# psql -h localhost -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+
+
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: reading_db
+    env_file: 
+    # .env ファイルから環境変数を読み込む
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    # ホストポート:コンテナポート
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    # データ永続化
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

@@ -7,7 +7,10 @@ FROM gradle:8.4-jdk21 AS build
 WORKDIR /app
 
 # リポジトリ直下の reading_app フォルダを丸ごとコピー
-COPY reading_app/ .  
+#COPY reading_app/ .  
+
+# 今のディレクトリ配下すべてをコンテナにコピー
+COPY . .
 
 # デバッグ用にファイル一覧を出力（あとでログで見られます）
 RUN ls -R /app
