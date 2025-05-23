@@ -1,33 +1,30 @@
-#################################
-# １）ビルド用ステージ
-#################################
-FROM gradle:8.4-jdk21 AS build
+# ====== ビルドステージ ======
+FROM gradle:8.4-jdk21 as build
 
-# 作業ディレクトリを /app にする
+# 作業ディレクトリを /app に
 WORKDIR /app
 
-# リポジトリ直下の reading_app フォルダを丸ごとコピー
-#COPY reading_app/ .  
+# Gradle関連ファイルをコピー
+COPY reading_app/build.gradle reading_app/settings.gradle ./
 
-# 今のディレクトリ配下すべてをコンテナにコピー
-COPY . .
+# ラッパー＆依存DL
+COPY reading_app/gradlew ./gradlew
+COPY reading_app/gradlew.bat ./gradlew.bat
+COPY reading_app/gradle ./gradle
+RUN chmod +x gradlew && ./gradlew --no-daemon dependencies
 
-# デバッグ用にファイル一覧を出力（あとでログで見られます）
-RUN ls -R /app
+# ソースをコピー
+COPY reading_app/src ./src
+COPY reading_app/. .
 
-# 実際にビルド
-RUN gradle clean build --no-daemon -x test
+# ビルド実行
+RUN ./gradlew --no-daemon clean build -x test
 
-#################################
-# ２）ランタイム用ステージ
-#################################
+# ====== 実行ステージ ======
 FROM eclipse-temurin:21-jdk-jammy
-
 WORKDIR /app
-
-# ビルドステージから生成された jar をコピー
 COPY --from=build /app/build/libs/*.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "app.jar"]
