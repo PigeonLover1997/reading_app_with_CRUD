@@ -6,6 +6,8 @@
 </head>
 <body>
     <h2>ログイン</h2>
+    <!-- ユーザー登録完了後のみ表示される成功メッセージ -->
+<p th:if="${registerSuccessMessage}" th:text="${registerSuccessMessage}" style="color:green;"></p>
     <form th:action="@{/login}" method="post">
         <div>
             <label>ユーザー名:

@@ -31,6 +31,23 @@ public class User {
     @Column(nullable = false, name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now(); // 初期値として現在時刻を設定
 
+    //ユーザーの希望する難易度・語数・問題数・トピックを保存するカラムの追加に対応したフィールド
+    //下記のカラムに対応するもの
+    /*  ADD COLUMN difficulty VARCHAR(16),
+    ADD COLUMN word_count INTEGER,
+    ADD COLUMN question_count INTEGER,
+    ADD COLUMN topic VARCHAR(1000); */  
+    // 設定しない場合を考慮してnullable=trueを指定  
+    @Column(nullable = true, length = 16)
+    private String difficulty;
+    @Column(nullable = true)
+    private Integer wordCount;
+    @Column(nullable = true)
+    private Integer questionCount;
+    @Column(nullable = true, length = 1000)
+    private String topic;
+
+
     // --- getter/setter ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -46,4 +63,16 @@ public class User {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getDifficulty() { return difficulty; }
+    public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
+
+    public Integer getWordCount() { return wordCount; }
+    public void setWordCount(Integer wordCount) { this.wordCount = wordCount; }
+
+    public Integer getQuestionCount() { return questionCount; }
+    public void setQuestionCount(Integer questionCount) { this.questionCount = questionCount; }
+
+    public String getTopic() { return topic; }
+    public void setTopic(String topic) { this.topic = topic;}
 }

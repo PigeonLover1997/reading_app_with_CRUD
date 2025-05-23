@@ -36,25 +36,26 @@
         </div>
     </div>
     <br>
-    <!-- 希望語数 -->
-    <div class="field">
-        <label>希望語数:</label><br />
-        <div th:each="cnt : ${defaultWordCounts}">
-            <label>
-                <!-- th:fieldでDTOバインドすることで実質name="wordCount"になる -->
-                <input type="radio" th:field="*{wordCount}" th:value="${cnt}" onchange="toggleCustomWordCount(this)" />
-                <span th:text="${cnt}" />語
-            </label>
-        </div>
-        <!-- 自由入力 -->
+<!-- 希望語数 -->
+<div class="field">
+  <label>希望語数:</label><br/>
+  <div th:each="cnt : ${defaultWordCounts}">
+    <label>
+      <input type="radio" name="wordCountRadio" th:field="*{wordCount}" th:value="${cnt}" onchange="toggleCustomWordCount(this)" />
+      <span th:text="${cnt}" />語
+    </label>
+  </div>
+  <!-- 自由入力 -->
         <label>
-            <input type="radio" th:field="*{wordCount}" value="0" onchange="toggleCustomWordCount(this)" />
+            <input type="radio" name="wordCountRadio" th:field="*{wordCount}" value="0"
+                onchange="toggleCustomWordCount(this)" />
             自由入力：
-            <input type="number" id="customWordCount" min="1" max="2000" placeholder="希望語数" class="free-word-input"
-                disabled />
+            <input type="number" id="customWordCount" name="customWordCount" min="1" max="2000" placeholder="希望語数"
+                class="free-word-input" disabled />
             語（1～2000の整数）
         </label>
-
+        <!-- hiddenフィールドがDTOのwordCountにname属性で対応  ラジオボタンの値と自由入力の値を内部的にこちらに統一 -->
+        <input type="hidden" id="wordCountFinal" name="wordCount" value="" />
     </div>
     <br>
     <!-- 選択式問題の数 -->
@@ -62,20 +63,22 @@
         <label>選択式問題の数:</label><br />
         <div th:each="num : ${defaultQuestionCounts}">
             <label>
-                <input type="radio" th:field="*{questionCount}" th:value="${num}"
+                <input type="radio" name="questionCountRadio" th:field="*{questionCount}" th:value="${num}"
                     onchange="toggleCustomQuestionCount(this)" />
                 <span th:text="${num}" />問
             </label>
         </div>
         <!-- 自由入力 -->
         <label>
-            <input type="radio" th:field="*{questionCount}" value="0" onchange="toggleCustomQuestionCount(this)" />
+            <input type="radio" name="questionCountRadio" th:field="*{questionCount}" value="0"
+                onchange="toggleCustomQuestionCount(this)" />
             自由入力：
-            <input type="number" id="customQuestionCount" min="1" max="10" placeholder="希望問題数" class="free-word-input"
-                disabled />
+            <input type="number" id="customQuestionCount" name="customQuestionCount" min="1" max="10"
+                placeholder="希望問題数" class="free-word-input" disabled />
             問（1～10の整数）
         </label>
-
+        <!-- hiddenフィールドがDTOのwordCountにname属性で対応  ラジオボタンの値と自由入力の値を内部的にこちらに統一 -->
+        <input type="hidden" id="questionCountFinal" name="questionCount" value="" />
     </div>
     <br>
     <!-- トピック -->
@@ -98,19 +101,37 @@
         document.getElementById('customQuestionCount').disabled = (radio.value != 0);
     }
 
-    // ラジオの値をnumber inputの値で上書きする
+    // hiddenフィールドに値をセットすることで、ラジオボタン選択での値入力と自由入力での値入力を両立させる
     function beforeSubmit() {
 
         // 希望語数
         var wordCountRadio = document.querySelector('input[name="wordCount"]:checked');
+        //確認用
+            if (!wordCountRadio) {
+        alert('wordCountRadioがnullです');
+        return false;
+    }
+        // ラジオボタンの値が0（自由入力）ならカスタムの値を～Finalにセット
         if (wordCountRadio.value === "0") {
-            wordCountRadio.value = document.getElementById('customWordCount').value;
+            // 自由入力値
+            document.getElementById('wordCountFinal').value = document.getElementById('customWordCount').value;
+        } else {
+            // ラジオの値
+            document.getElementById('wordCountFinal').value = wordCountRadio.value;
         }
 
         // 選択式問題の数
         var questionCountRadio = document.querySelector('input[name="questionCount"]:checked');
+        //確認用
+    if (!questionCountRadio) {
+        alert('questionCountRadioがnullです');
+        return false;
+    }
+        // ラジオボタンの値が0（自由入力）ならカスタムの値を～Finalにセット
         if (questionCountRadio.value === "0") {
-            questionCountRadio.value = document.getElementById('customQuestionCount').value;
+            document.getElementById('questionCountFinal').value = document.getElementById('customQuestionCount').value;
+        } else {
+            document.getElementById('questionCountFinal').value = questionCountRadio.value;
         }
 
         // 確認用に値を出力
@@ -119,17 +140,4 @@
         return true;
     }
 
-    //ページ初期化時にJavaScriptで初期値をセットする（ユーザーDTOの値が自由入力でラジオボタン値以外の場合用）
-    window.addEventListener('DOMContentLoaded', function () {
-    // 既にcheckedの語数ラジオボタンがあれば、そのままにする（Spring+Thymeleafで自動checkedされている）
-    var alreadyChecked = document.querySelector('input[type="radio"][name="wordCount"]:checked');
-    if (alreadyChecked) {
-        toggleCustomWordCount(alreadyChecked);
-    }
-    // 問題数も同様に
-    var alreadyCheckedQ = document.querySelector('input[type="radio"][name="questionCount"]:checked');
-    if (alreadyCheckedQ) {
-        toggleCustomQuestionCount(alreadyCheckedQ);
-    }
-});
 </script>

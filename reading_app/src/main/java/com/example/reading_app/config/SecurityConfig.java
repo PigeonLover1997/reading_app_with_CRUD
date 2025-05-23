@@ -15,7 +15,8 @@ public class SecurityConfig {
         http
             // ページごとのアクセス権を設定
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/register", "/css/**", "/js/**").permitAll() // 誰でもアクセス可
+                // 誰でもアクセス可：トップページ、問題作成後の出題ページ、解答後のフィードバックページ、ユーザー登録ページ、CSS、Javascript
+                .requestMatchers("/","/generate", "/submitAnswers","/register","/register/**", "/css/**", "/js/**").permitAll() 
                 .anyRequest().authenticated() // 他は認証必須
             )
             // フォームログインの設定
