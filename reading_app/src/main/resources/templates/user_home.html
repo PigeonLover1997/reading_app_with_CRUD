@@ -66,21 +66,23 @@
     }
 
     /* ラジオボタンをスマホだけ大きくする */
-@media (max-width: 768px) { 
-  input[type="radio"] {
-    transform: scale(1.25);
-    margin-right: 6px; /* テキストとの間の余白も調整（任意） */
-    vertical-align: middle; /* 縦位置も調整（任意） */
-  }
-}
+    @media (max-width: 768px) {
+      input[type="radio"] {
+        transform: scale(1.25);
+        margin-right: 6px;
+        /* テキストとの間の余白も調整（任意） */
+        vertical-align: middle;
+        /* 縦位置も調整（任意） */
+      }
+    }
 
-/* 自由入力欄 */
-.free-word-input {
-  /* 半角文字12文字分くらいの幅 */
-  width: 12ch;
-  /* padding／border を含めた幅にしたい場合は box-sizing を追加 */
-  box-sizing: border-box;
-}
+    /* 自由入力欄 */
+    .free-word-input {
+      /* 半角文字12文字分くらいの幅 */
+      width: 12ch;
+      /* padding／border を含めた幅にしたい場合は box-sizing を追加 */
+      box-sizing: border-box;
+    }
   </style>
 </head>
 
@@ -100,7 +102,7 @@
     <button type="submit">ログアウト</button>
   </form>
 
-   <p>ログインしています。ユーザー名：<span th:text="${username}"></span></p>
+  <p>ログインしています。ユーザー名：<span th:text="${username}"></span></p>
 
   <br />
   <form th:action="@{/generate}" method="post">
@@ -111,7 +113,8 @@
       <div th:each="lvl : ${levels}">
         <!-- lvl の値で表示を切り替える -->
         <label th:switch="${lvl}">
-          <input type="radio" name="difficulty" th:value="${lvl}" th:checked="${lvl=='A1'}" />
+          <!-- ユーザーに設定されている難易度initDifficultyを初期値に -->
+          <input type="radio" name="difficulty" th:value="${lvl}" th:checked="${lvl==initDifficulty}" />
 
           <!-- 各CEFRの場合に応じた難易度目安を表示 -->
           <span th:case="'Below A1'">
@@ -163,15 +166,18 @@
       <!-- テンプレートからリストを回す -->
       <div th:each="cnt : ${defaultWordCounts}">
         <label>
-          <input type="radio" name="wordCountRadio" th:value="${cnt}" th:checked="${cnt==200}" />
+          <!-- ユーザーに設定されている語数initWordCountを初期値に -->
+          <input type="radio" name="wordCountRadio" th:value="${cnt}" th:checked="${cnt==initWordCount}" />
           <span th:text="${cnt}" />語
         </label>
       </div>
       <!-- 自由入力 -->
       <label>
-        <input type="radio" name="wordCountRadio" value="0" />
+        <input type="radio" name="wordCountRadio" value="0"
+          th:checked="${not #lists.contains(defaultWordCounts, initWordCount)}" />
         自由入力：
-        <input type="number" name="customWordCount" min="1" max="2000" placeholder="希望語数" class="free-word-input" />
+        <input type="number" name="customWordCount" min="1" max="2000" placeholder="希望語数" class="free-word-input"
+          th:value="${not #lists.contains(defaultWordCounts, initWordCount) ? initWordCount : ''}" />
         語
       </label>
     </div>
@@ -226,23 +232,28 @@
       <!-- テンプレートからリストを回す -->
       <div th:each="num : ${defaultQuestionCounts}">
         <label>
-          <input type="radio" name="questionCountRadio" th:value="${num}" th:checked="${num==2}" />
+          <!-- ユーザーに設定されている問題数initQuestionCountを初期値に -->
+          <input type="radio" name="questionCountRadio" th:value="${num}" th:checked="${num==initQuestionCount}" />
           <span th:text="${num}" />問
         </label>
       </div>
       <!-- 自由入力 -->
       <label>
-        <input type="radio" name="questionCountRadio" value="0" />
-        自由入力：
-        <input type="number" name="customQuestionCount" min="1" max="10" placeholder="希望問題数"  class="free-word-input" />
-        問
-      </label>
+  <input type="radio" name="questionCountRadio" value="0"
+    th:checked="${not #lists.contains(defaultQuestionCounts, initQuestionCount)}" />
+  自由入力：
+  <input type="number" name="customQuestionCount"
+    min="1" max="10" placeholder="希望問題数" class="free-word-input"
+    th:value="${not #lists.contains(defaultQuestionCounts, initQuestionCount) ? initQuestionCount : ''}" />
+  問
+</label>
     </div>
 
     <!-- トピック -->
     <div class="field">
       <label for="topic">トピック（任意）:</label><br />
-      <input type="text" id="topic" name="topic" placeholder="例: AIを活用した英語学習" />
+      <!-- ユーザーに設定されているトピックinitTopicを初期値に -->
+      <input type="text" id="topic" name="topic" placeholder="例: AIを活用した英語学習" th:value="${initTopic}" />
       <br />空欄にした場合、ランダムなトピックが選ばれます。
     </div>
     <!-- 注意部分を網掛け -->

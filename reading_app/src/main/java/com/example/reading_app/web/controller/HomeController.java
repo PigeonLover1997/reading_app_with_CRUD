@@ -4,17 +4,20 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.reading_app.domain.model.User;
 import com.example.reading_app.domain.model.dto.FeedbackResultDto;
 import com.example.reading_app.domain.model.dto.ReadingTaskDto;
+import com.example.reading_app.domain.repository.UserRepository;
 import com.example.reading_app.domain.service.FeedbackGenerationService;
 import com.example.reading_app.domain.service.TaskGenerationService;
-
+import com.example.reading_app.domain.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
@@ -29,6 +32,9 @@ public class HomeController {
 
     @Autowired
     private ObjectMapper objectMapper; // Jacksonのマッパーを注入
+
+    @Autowired
+    private UserService userService;
 
     /** ゲスト用トップページ（フォーム入力画面） */
     @GetMapping("/")
@@ -55,6 +61,17 @@ public class HomeController {
 
         // principal.getName()でユーザー名を取得し、登録
         model.addAttribute("username", principal.getName());
+
+    // ユーザーごとの語数などの初期値を取得（Userオブジェクトなどから取得）
+    Optional<User> user = userService.findByUsername(principal.getName());
+
+    if (user.isPresent()) {
+        model.addAttribute("initDifficulty", user.get().getDifficulty());
+        model.addAttribute("initWordCount", user.get().getWordCount());
+        model.addAttribute("initQuestionCount", user.get().getQuestionCount());
+        model.addAttribute("initTopic", user.get().getTopic());
+    }
+
         return "user_home";
     }
 
