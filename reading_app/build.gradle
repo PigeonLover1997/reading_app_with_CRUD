@@ -41,7 +41,7 @@ dependencies {
 
 	// Spring Data JPA の PostgreSQL 用の依存関係
 	// PostgreSQL JDBC ドライバー
-	runtimeOnly   'org.postgresql:postgresql' 
+	implementation 'org.postgresql:postgresql' 
 	// Flyway 本体 + PostgreSQL 追加モジュール
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.flywaydb:flyway-database-postgresql'
