@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ja">
 
 <head>
   <meta charset="UTF-8" />
@@ -180,7 +180,14 @@
       </ul>
     </div>
   </div>
+
   <a th:href="@{/}">トップに戻る</a>
+
+  <!-- ログイン状態でリンク先を出し分け -->
+  <!-- <p>
+    <a sec:authorize="isAuthenticated()" th:href="@{/user/home}">マイページに戻る</a>
+    <a sec:authorize="isAnonymous()" th:href="@{/}">トップに戻る</a>
+  </p> -->
 </body>
 <script>
   // --- タイマー処理 ---

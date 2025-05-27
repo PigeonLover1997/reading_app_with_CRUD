@@ -48,6 +48,12 @@ dependencies {
 
 	// Spring Securityの導入・設定
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// Spring Security Dialectを追加 フィードバックページで使用するsec:authorize用
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+	// バリデーション機能を有効化
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {

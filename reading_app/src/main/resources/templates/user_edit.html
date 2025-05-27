@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>プロフィール編集</title>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <h1>プロフィール編集</h1>
+
+    <!-- 更新完了メッセージ -->
+    <p th:if="${updateSuccess}" th:text="${updateSuccess}"></p>
+
+
+    <form th:action="@{/user/edit}" method="post" th:object="${userEditForm}" onsubmit="return beforeSubmit();">
+
+
+        <!-- ユーザー名・パスワードは編集不可 -->
+        <div>
+            <label>ユーザー名: </label>
+            <span th:text="*{username}"></span>
+            <!-- 隠しフィールドで値は送る -->
+            <input type="hidden" th:field="*{username}" />
+        </div>
+
+        <br>
+        <p>問題作成時の希望条件を編集できます。ユーザー名やパスワードの変更は別ページで行えます。</p>
+        <br>
+
+        <!-- 難易度 (CEFR) -->
+        <div class="field">
+            <label>難易度 (CEFR):</label><br />
+            <div th:each="lvl : ${levels}">
+                <label th:switch="${lvl}">
+                    <input type="radio" th:field="*{difficulty}" th:value="${lvl}" required />
+                    <span th:case="'Below A1'">入門（英検5～4級）</span>
+                    <span th:case="'A1'">A1（英検3級／TOEIC 300）</span>
+                    <span th:case="'A2'">A2（英検準2級／TOEIC 450）</span>
+                    <span th:case="'B1'">B1（英検2級／TOEIC 600）</span>
+                    <span th:case="'B2'">B2（英検準1級／TOEIC 800）</span>
+                    <span th:case="'C1'">C1（英検1級／TOEIC 950）</span>
+                    <span th:case="'C2'">C2（英検1級+α／TOEIC 990+α）</span>
+                    <span th:case="'Over C2'">超上級（英語ネイティブの大人でも難しい）</span>
+                    <span th:case="*"><span th:text="${lvl}">?</span></span>
+                </label>
+            </div>
+        </div>
+        <br>
+
+        <!-- 希望語数 -->
+        <div class="field">
+            <label>希望語数:</label><br />
+            <div th:each="cnt : ${defaultWordCounts}">
+                <label>
+                    <!-- th:fieldで自動選択される（値がdefaultWordCountsにあればラジオ、なければ自由入力） -->
+                    <input type="radio" th:field="*{wordCount}" th:value="${cnt}" onchange="toggleCustomWordCount(this)"
+                        required />
+                    <span th:text="${cnt}" />語
+                </label>
+            </div>
+            <!-- 自由入力 -->
+            <label>
+                <!-- 値がdefaultWordCountsになければ、自由入力＋ラジオが自動選択 -->
+                <input type="radio" th:field="*{wordCount}" value="0" onchange="toggleCustomWordCount(this)" />
+                自由入力：
+                <input type="number" id="customWordCount" min="1" max="2000" placeholder="希望語数" class="free-word-input"
+                    th:value="${not #lists.contains(defaultWordCounts, userEditForm.wordCount) ? userEditForm.wordCount : ''}"
+                    th:disabled="${#lists.contains(defaultWordCounts, userEditForm.wordCount)}" />
+                語（1～2000の整数）
+            </label>
+        </div>
+        <br>
+
+        <!-- 選択式問題の数 -->
+        <div class="field">
+            <label>選択式問題の数:</label><br />
+            <div th:each="num : ${defaultQuestionCounts}">
+                <label>
+                    <input type="radio" th:field="*{questionCount}" th:value="${num}"
+                        onchange="toggleCustomQuestionCount(this)" required />
+                    <span th:text="${num}" />問
+                </label>
+            </div>
+            <!-- 自由入力 -->
+            <label>
+                <input type="radio" th:field="*{questionCount}" value="0" onchange="toggleCustomQuestionCount(this)" />
+                自由入力：
+                <input type="number" id="customQuestionCount" min="1" max="10" placeholder="希望問題数"
+                    class="free-word-input"
+                    th:value="${not #lists.contains(defaultQuestionCounts, userEditForm.questionCount) ? userEditForm.questionCount : ''}"
+                    th:disabled="${#lists.contains(defaultQuestionCounts, userEditForm.questionCount)}" />
+                問（1～10の整数）
+            </label>
+        </div>
+        <br>
+
+        <!-- トピック -->
+        <div class="field">
+            <label for="topic">トピック（任意）:</label><br />
+            <input type="text" th:field="*{topic}" placeholder="例: AIを活用した英語学習" />
+            <br />空欄で保存すると、ログイン時も空欄（ランダム）になります。
+        </div>
+        <br>
+        <button type="submit">プロフィールを更新</button>
+    </form>
+
+    <!-- ログイン後トップページに戻るリンク -->
+    <p>
+        <a th:href="@{/user/home}"> マイページに戻る</a>
+    </p>
+
+    <script>
+        //自由入力欄の有効/無効制御
+        function toggleCustomWordCount(radio) {
+            document.getElementById('customWordCount').disabled = (radio.value != 0);
+        }
+        function toggleCustomQuestionCount(radio) {
+            document.getElementById('customQuestionCount').disabled = (radio.value != 0);
+        }
+        window.addEventListener('DOMContentLoaded', function () {
+            var alreadyChecked = document.querySelector('input[type="radio"][name="wordCount"]:checked');
+            if (alreadyChecked) {
+                toggleCustomWordCount(alreadyChecked);
+            }
+            var alreadyCheckedQ = document.querySelector('input[type="radio"][name="questionCount"]:checked');
+            if (alreadyCheckedQ) {
+                toggleCustomQuestionCount(alreadyCheckedQ);
+            }
+        });
+
+        // ラジオの値をnumber inputの値で上書きする（登録フォームのJSを流用）
+        function beforeSubmit() {
+            var wordCountRadio = document.querySelector('input[name="wordCount"]:checked');
+            if (wordCountRadio.value === "0") {
+                wordCountRadio.value = document.getElementById('customWordCount').value;
+            }
+            var questionCountRadio = document.querySelector('input[name="questionCount"]:checked');
+            if (questionCountRadio.value === "0") {
+                questionCountRadio.value = document.getElementById('customQuestionCount').value;
+            }
+            return true;
+        }
+    </script>
+</body>
+
+</html>

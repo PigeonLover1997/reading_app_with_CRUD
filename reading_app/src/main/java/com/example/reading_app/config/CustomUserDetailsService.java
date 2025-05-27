@@ -15,15 +15,17 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+    // Spring の DI（依存性注入）コンテナが起動時に UserRepository のインスタンスを渡して、このサービスクラスを生成する
+    // loadUserByUsername(...) の内部でユーザー検索を行う際、userRepository を利用して DB からユーザーを取得できるようにするための初期化処理
+    public CustomUserDetailsService(UserRepository repo) {
+        this.userRepository = repo;
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
             //Spring Security の認証フィルター（内部ロジック）が自動でこの例外をキャッチし、「ログイン失敗」として扱い、エラーメッセージの表示（th:if="${param.error}"）につなげる
             .orElseThrow(() -> new UsernameNotFoundException("ユーザーが見つかりません"));
-        return org.springframework.security.core.userdetails.User.builder()
-            .username(user.getUsername())
-            .password(user.getPasswordHash())
-            .roles(user.getRole())
-            .build();
+        return new CustomUserDetails(user); // ←標準のUserDetailsではなく、独自のCustomUserDetailsを返す
     }
 }

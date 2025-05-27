@@ -1,12 +1,35 @@
 package com.example.reading_app.web.controller.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 // ユーザー登録フォーム用DTO
-public class UserForm {
+public class UserRegisterForm {
+    // 登録時のみ必須。編集画面では含まない
+    @NotBlank(message = "ユーザー名は必須です")
     private String username;
+
+    @NotBlank(message = "パスワードは必須です")
+    @Size(min = 4, message = "パスワードは4文字以上で入力してください（テスト用の仮のバリデーション）")
     private String password;
+
+    // 以下は登録／編集共通
+    @NotBlank(message = "難易度は必須です")
     private String difficulty;    // 難易度
+
+    @NotNull(message = "語数は必須です")
+    @Min(value = 1, message = "語数は1以上2000以下で設定してください")
+    @Max(value = 2000, message = "語数は1以上2000以下で設定してください")
     private Integer wordCount;    // 希望語数
+
+    @NotNull(message = "問題数は必須です")
+    @Min(value = 1, message = "問題数は1以上10以下で設定してください")
+    @Max(value = 10, message = "問題数は1以上10以下で設定してください")
     private Integer questionCount; // 選択式問題の数
+    
     private String topic;         // トピック（以上4項目を後から追加）
 
     // getter / setter

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import com.example.reading_app.web.controller.dto.UserForm;
+import com.example.reading_app.web.controller.dto.UserRegisterForm;
 
 @Controller
 public class AuthController {
@@ -26,14 +26,14 @@ public class AuthController {
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         // ユーザー登録フォーム用のDTOを作成し、初期値（画面で選択済の値）を設定
-        UserForm userForm = new UserForm();
+        UserRegisterForm userForm = new UserRegisterForm();
         userForm.setDifficulty("A1");
         userForm.setWordCount(200);
         userForm.setQuestionCount(2);
         // トピックはユーザー登録段階では初期値なしだが、将来的にユーザー情報編集画面でも同じ構造で設定できるようにする
         // いずれの項目も、ユーザー情報編集画面では現在の設定値（user.getDifficulty()など）を初期値にする想定
         userForm.setTopic(null);
-        model.addAttribute("userForm", userForm);
+        model.addAttribute("userRegisterForm", userForm);
         // 希望条件選択用のリスト項目
         model.addAttribute("levels", List.of("Below A1","A1","A2","B1","B2","C1","C2","Over C2"));
         model.addAttribute("defaultWordCounts", List.of(100,200,300,400,500));
@@ -43,7 +43,7 @@ public class AuthController {
 
     // ユーザー登録処理
     @PostMapping("/register")
-    public String processRegister(@ModelAttribute("userForm") UserForm userForm,
+    public String processRegister(@ModelAttribute("userForm") UserRegisterForm userForm,
                                   RedirectAttributes redirectAttributes) {
         // ユーザー名重複チェック
         if (userRepository.findByUsername(userForm.getUsername()).isPresent()) {

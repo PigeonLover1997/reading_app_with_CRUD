@@ -97,12 +97,19 @@
     <br />また、希望条件に必ずしも沿うとは限らず、難易度についてもあくまで参考程度となります。
   </div>
 
+  <!-- プロフィール更新成功メッセージ -->
+  <p th:if="${updateSuccess}" th:text="${updateSuccess}" style="color:green;"></p>
+
+  <!-- ログインユーザー名の表示 -->
+  <p>ログイン中（ユーザー名：<span th:text="${username}"></span>）</p>
+
   <!-- Spring Securityの「/logout」はGETではなくPOSTでアクセスするのが推奨されている（セキュリティ強化のため） -->
   <form th:action="@{/logout}" method="post" style="display:inline;">
     <button type="submit">ログアウト</button>
   </form>
-
-  <p>ログインしています。ユーザー名：<span th:text="${username}"></span></p>
+  <form th:action="@{/user/edit}" method="get">
+  <button type="submit">プロフィールを編集</button>
+  </form>
 
   <br />
   <form th:action="@{/generate}" method="post">

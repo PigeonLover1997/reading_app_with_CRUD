@@ -6,7 +6,7 @@
 <p th:if="${error}" th:text="${error}"></p>
 <br>
 <!-- beforeSubmit()を使って自由入力の値とラジオボタンの値を両立 -->
-<form th:action="@{/register}" method="post" th:object="${userForm}" onsubmit="return beforeSubmit();">
+<form th:action="@{/register}" method="post" th:object="${userRegisterForm}" onsubmit="return beforeSubmit();">
     <div>
         <label>ユーザー名: <input type="text" th:field="*{username}" required></label>
     </div>
@@ -22,7 +22,8 @@
         <label>難易度 (CEFR):</label><br />
         <div th:each="lvl : ${levels}">
             <label th:switch="${lvl}">
-                <input type="radio" th:field="*{difficulty}" th:value="${lvl}" />
+                <input type="radio" th:field="*{difficulty}" th:value="${lvl}"
+                    th:checked="${lvl==userRegisterForm.difficulty}" />
                 <span th:case="'Below A1'">入門（目安：英検5～4級）</span>
                 <span th:case="'A1'">A1（目安：英検3級／TOEIC 300）</span>
                 <span th:case="'A2'">A2（目安：英検準2級／TOEIC 450）</span>
@@ -42,7 +43,8 @@
         <div th:each="cnt : ${defaultWordCounts}">
             <label>
                 <!-- th:fieldでDTOバインドすることで実質name="wordCount"になる -->
-                <input type="radio" th:field="*{wordCount}" th:value="${cnt}" onchange="toggleCustomWordCount(this)" />
+                <input type="radio" th:field="*{wordCount}" th:value="${cnt}" onchange="toggleCustomWordCount(this)"
+                    th:checked="${cnt==userRegisterForm.wordCount}" />
                 <span th:text="${cnt}" />語
             </label>
         </div>
@@ -88,6 +90,10 @@
     <button type="submit">ユーザー登録</button>
 </form>
 
+<!-- ゲスト用トップページに戻るリンク -->
+<p>
+    <a th:href="@{/}">トップページに戻る</a>
+</p>
 
 <script>
     //自由入力欄の有効/無効制御
@@ -121,15 +127,15 @@
 
     //ページ初期化時にJavaScriptで初期値をセットする（ユーザーDTOの値が自由入力でラジオボタン値以外の場合用）
     window.addEventListener('DOMContentLoaded', function () {
-    // 既にcheckedの語数ラジオボタンがあれば、そのままにする（Spring+Thymeleafで自動checkedされている）
-    var alreadyChecked = document.querySelector('input[type="radio"][name="wordCount"]:checked');
-    if (alreadyChecked) {
-        toggleCustomWordCount(alreadyChecked);
-    }
-    // 問題数も同様に
-    var alreadyCheckedQ = document.querySelector('input[type="radio"][name="questionCount"]:checked');
-    if (alreadyCheckedQ) {
-        toggleCustomQuestionCount(alreadyCheckedQ);
-    }
-});
+        // 既にcheckedの語数ラジオボタンがあれば、そのままにする（Spring+Thymeleafで自動checkedされている）
+        var alreadyChecked = document.querySelector('input[type="radio"][name="wordCount"]:checked');
+        if (alreadyChecked) {
+            toggleCustomWordCount(alreadyChecked);
+        }
+        // 問題数も同様に
+        var alreadyCheckedQ = document.querySelector('input[type="radio"][name="questionCount"]:checked');
+        if (alreadyCheckedQ) {
+            toggleCustomQuestionCount(alreadyCheckedQ);
+        }
+    });
 </script>
