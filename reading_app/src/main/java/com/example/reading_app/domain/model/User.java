@@ -47,6 +47,10 @@ public class User {
     @Column(nullable = true, length = 1000)
     private String topic;
 
+    // ユーザーが有効かどうかを示すフラグ
+    @Column(nullable = false, name = "is_active")
+    private Boolean isActive = true; // 初期値はtrue（有効）
+
 
     // --- getter/setter ---
     public Long getId() { return id; }
@@ -75,4 +79,8 @@ public class User {
 
     public String getTopic() { return topic; }
     public void setTopic(String topic) { this.topic = topic;}
+
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+
 }

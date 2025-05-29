@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>アカウント削除</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>アカウント削除</h1>
+    <p>アカウントを削除すると、ユーザーデータが無効状態になります。（データベースからの物理的な削除は、その後管理者が行います）</p>
+    削除する場合、パスワードを入力のうえ、削除ボタンを押してください。
+    <br>
+    <form th:action="@{/user/account/delete}" method="post" th:object="${deleteForm}">
+        <div>
+            <label>パスワードを入力してください：
+                <input type="password" th:field="*{password}" required>
+            </label>
+            <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red;"></span>
+        </div>
+        <br>
+        <button type="submit" style="color:red;"
+            onclick="return confirm('本当に削除しますか？この操作は取り消せません。\n「OK」で削除、「キャンセル」で中止します。');">
+            削除する
+        </button>
+    </form>
+    <p><a th:href="@{/user/account}">戻る</a></p>
+</body>
+</html>

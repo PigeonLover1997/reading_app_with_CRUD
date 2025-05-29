@@ -181,13 +181,17 @@
     </div>
   </div>
 
-  <a th:href="@{/}">トップに戻る</a>
-
   <!-- ログイン状態でリンク先を出し分け -->
-  <!-- <p>
-    <a sec:authorize="isAuthenticated()" th:href="@{/user/home}">マイページに戻る</a>
-    <a sec:authorize="isAnonymous()" th:href="@{/}">トップに戻る</a>
-  </p> -->
+  <p>
+    <a sec:authorize="isAuthenticated()" th:href="@{/user/home}">ユーザー用トップページに戻る</a>
+    <br>
+    <br>
+    <a sec:authorize="isAuthenticated()" href="#" onclick="logoutAndRedirect(event)">ログアウトする（ゲスト用トップページに戻る）</a>
+    <form id="logoutForm" th:action="@{/logout}" method="post" style="display:none;"></form>
+    
+    <a sec:authorize="isAnonymous()" th:href="@{/}">ゲスト用トップページに戻る</a>
+  </p>
+
 </body>
 <script>
   // --- タイマー処理 ---
@@ -232,6 +236,13 @@
     const wc = countWords(compositionArea.value);
     compositionCountEl.textContent = `(words count: ${wc})`;
   });
+
+  // --- ログアウト処理 ---
+    function logoutAndRedirect(event) {
+    event.preventDefault();
+    document.getElementById('logoutForm').submit();
+    // Spring Securityの.logoutSuccessUrl("/?logout")により自動で/に遷移
+  }
 </script>
 
 </html>

@@ -2,12 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>プロフィール編集</title>
+    <title>希望条件編集</title>
     <meta charset="UTF-8">
 </head>
 
 <body>
-    <h1>プロフィール編集</h1>
+    <h1>希望条件編集</h1>
 
     <!-- 更新完了メッセージ -->
     <p th:if="${updateSuccess}" th:text="${updateSuccess}"></p>
@@ -25,7 +25,11 @@
         </div>
 
         <br>
-        <p>問題作成時の希望条件を編集できます。ユーザー名やパスワードの変更は別ページで行えます。</p>
+        <p>
+            問題作成時の希望条件を編集できます。ユーザー名やパスワードの変更、アカウントの削除は
+            <a th:href="@{/user/account}">別ページ</a>
+            で行えます。
+        </p>
         <br>
 
         <!-- 難易度 (CEFR) -->

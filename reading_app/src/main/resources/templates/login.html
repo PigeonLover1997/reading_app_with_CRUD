@@ -1,13 +1,17 @@
 <!-- templates/login.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>ログイン</title>
 </head>
+
 <body>
     <h2>ログイン</h2>
     <!-- ユーザー登録完了後のみ表示される成功メッセージ -->
-<p th:if="${registerSuccessMessage}" th:text="${registerSuccessMessage}" style="color:green;"></p>
+    <p th:if="${registerSuccessMessage}" th:text="${registerSuccessMessage}" style="color:green;"></p>
+    <!-- ユーザー削除完了後のみ表示される削除メッセージ -->
+    <p th:if="${deletedAccountMessage}" th:text="${deletedAccountMessage}" style="color:green;"></p>
     <form th:action="@{/login}" method="post">
         <div>
             <label>ユーザー名:
@@ -21,10 +25,23 @@
         </div>
         <button type="submit">ログイン</button>
     </form>
-    <!-- ログインエラーやログアウト時の表示 -->
-    <p th:if="${param.error}" style="color:red;">ユーザー名またはパスワードが違います</p>
+    <!-- ログインエラーやログアウト時、および無効ユーザーでのログイン時の表示 -->
+    <p th:if="${param.error}" style="color:red;">
+        <!-- エラーメッセージに「無効なアカウント」が含まれているかで分岐 -->
+        <span
+            th:if="${session['SPRING_SECURITY_LAST_EXCEPTION'] != null and #strings.contains(session['SPRING_SECURITY_LAST_EXCEPTION'].message, '無効なアカウント')}"
+            th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}">
+            無効なアカウントです（削除済、停止されているなど）
+        </span>
+        <!-- 含まれていない場合は、無効ユーザーでのログインではなく、認証情報が違っている想定 -->
+        <span
+            th:unless="${session['SPRING_SECURITY_LAST_EXCEPTION'] != null and #strings.contains(session['SPRING_SECURITY_LAST_EXCEPTION'].message, '無効なアカウント')}">
+            ユーザー名またはパスワードが違います
+        </span>
+    </p>
     <p th:if="${param.logout}" style="color:green;">ログアウトしました</p>
     <p><a th:href="@{/register}">ユーザー登録はこちら</a></p>
     <p><a th:href="@{/}">ゲスト用トップページへ</a></p>
 </body>
+
 </html>

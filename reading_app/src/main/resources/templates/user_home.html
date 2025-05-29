@@ -88,7 +88,7 @@
 
 <body>
   <h1>英語読解問題&英作文問題ジェネレータ</h1>
-  <p>ページ最下部の「問題を生成」ボタンを押下すると、下記に指定した希望条件で、問題文・選択式読解問題・英作文問題が生成されます。
+  <p>ページ最下部の「問題を生成」ボタンを押すと、下記に指定した希望条件で、問題文・選択式読解問題・英作文問題が生成されます。
     <!-- 注意部分を網掛け -->
   <div
     style="background-color: #bffcff; padding: 10px; border-left: 4px solid #ccc; margin-top: 1em; margin-bottom: 1em;">
@@ -101,15 +101,25 @@
   <p th:if="${updateSuccess}" th:text="${updateSuccess}" style="color:green;"></p>
 
   <!-- ログインユーザー名の表示 -->
-  <p>ログイン中（ユーザー名：<span th:text="${username}"></span>）</p>
+  <p><span style="color:green;" th:text="|ログイン中です（ユーザー名：${username}|"></span>）
+    <span sec:authorize="hasRole('ADMIN')" style="color:orangered;">（管理者ロールでログインしています）</span>
+  </p>
 
-  <!-- Spring Securityの「/logout」はGETではなくPOSTでアクセスするのが推奨されている（セキュリティ強化のため） -->
-  <form th:action="@{/logout}" method="post" style="display:inline;">
-    <button type="submit">ログアウト</button>
-  </form>
-  <form th:action="@{/user/edit}" method="get">
-  <button type="submit">プロフィールを編集</button>
-  </form>
+  <!-- ユーザー情報管理（管理者専用） -->
+  <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/users}">ユーザー情報管理（管理者専用）</a>
+  <br>
+  <div style="margin-bottom: 1.5em; display: flex; gap: 1em;">
+    <!-- Spring Securityの「/logout」はGETではなくPOSTでアクセスするのが推奨されている（セキュリティ強化のため） -->
+    <form th:action="@{/logout}" method="post" style="display:inline;">
+      <button type="submit">ログアウト</button>
+    </form>
+    <form th:action="@{/user/edit}" method="get">
+      <button type="submit">希望条件を編集</button>
+    </form>
+    <form th:action="@{/user/account}" method="get">
+      <button type="submit">ユーザー名・パスワードを変更</button>
+    </form>
+  </div>
 
   <br />
   <form th:action="@{/generate}" method="post">
@@ -185,7 +195,7 @@
         自由入力：
         <input type="number" name="customWordCount" min="1" max="2000" placeholder="希望語数" class="free-word-input"
           th:value="${not #lists.contains(defaultWordCounts, initWordCount) ? initWordCount : ''}" />
-        語
+        語（1～2000の整数）
       </label>
     </div>
 
@@ -246,14 +256,13 @@
       </div>
       <!-- 自由入力 -->
       <label>
-  <input type="radio" name="questionCountRadio" value="0"
-    th:checked="${not #lists.contains(defaultQuestionCounts, initQuestionCount)}" />
-  自由入力：
-  <input type="number" name="customQuestionCount"
-    min="1" max="10" placeholder="希望問題数" class="free-word-input"
-    th:value="${not #lists.contains(defaultQuestionCounts, initQuestionCount) ? initQuestionCount : ''}" />
-  問
-</label>
+        <input type="radio" name="questionCountRadio" value="0"
+          th:checked="${not #lists.contains(defaultQuestionCounts, initQuestionCount)}" />
+        自由入力：
+        <input type="number" name="customQuestionCount" min="1" max="10" placeholder="希望問題数" class="free-word-input"
+          th:value="${not #lists.contains(defaultQuestionCounts, initQuestionCount) ? initQuestionCount : ''}" />
+        問（1～10の整数）
+      </label>
     </div>
 
     <!-- トピック -->
@@ -269,7 +278,7 @@
       <strong>注意：</strong> OpenAIに対して、開発やサービス改善のため入出力内容を提供することでAIの利用料金を無料化しています。
       <br><strong>個人情報や機密情報などをトピック欄や英作文解答欄に入力しないでください。</strong>
       <br>データ提供にご同意いただいたうえでご利用ください。
-      <br>また、問題文の生成語数によりますが、ボタン押下からページ表示までに数十秒かかる場合があります。
+      <br>また、問題文の生成語数によりますが、ボタンを押してからページ表示までに数十秒かかる場合があります。
     </div>
     <button type="submit">問題を生成</button>
   </form>

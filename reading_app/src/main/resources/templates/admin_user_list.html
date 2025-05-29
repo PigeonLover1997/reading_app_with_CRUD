@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>全ユーザー一覧（管理者専用）</title>
+    <style>
+      table { border-collapse: collapse; }
+      th, td { border: 1px solid #aaa; padding: 0.5em; }
+      th { background: #eee; }
+    </style>
+</head>
+<body>
+<h1>全ユーザー一覧（管理者専用）</h1>
+
+<!-- 更新完了メッセージ -->
+<p th:if="${updateSuccess}" th:text="${updateSuccess}" style="color:green;"></p>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>ユーザー名</th>
+            <th>権限</th>
+            <th>有効/無効</th>
+            <th>難易度</th>
+            <th>希望語数</th>
+            <th>選択式問題の数</th>
+            <th>トピック</th>
+            <th>作成日時</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="u : ${users}">
+            <!-- IDは編集画面へのリンク -->
+            <td>
+                <a th:href="@{|/admin/users/${u.id}|}" th:text="${u.id}"></a>
+            </td>
+            <td th:text="${u.username}"></td>
+            <td th:text="${u.role}"></td>
+            <td th:text="${u.isActive} ? '有効' : '無効'"></td>
+            <td th:text="${u.difficulty}"></td>
+            <td th:text="${u.wordCount}"></td>
+            <td th:text="${u.questionCount}"></td>
+            <td th:text="${u.topic}"></td>
+            <td th:text="${#temporals.format(u.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+            <td>
+                <a th:href="@{|/admin/users/${u.id}|}">編集</a>
+                <!-- ここで削除リンクを追加したい場合は以下（確認ダイアログ付） -->
+                <form th:action="@{|/admin/users/${u.id}/delete|}" method="post" style="display:inline;">
+                    <button type="submit" onclick="return confirm('本当に削除しますか？');" style="color:red;">削除</button>
+                </form>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<p>
+    <a th:href="@{/user/home}">マイページに戻る</a>
+</p>
+</body>
+</html>

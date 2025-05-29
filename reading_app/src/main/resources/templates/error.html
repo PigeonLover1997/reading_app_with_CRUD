@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>エラーページ</title>
+</head>
+<body>
+    <h1>エラーページ</h1>
+    <p>おそらく問題生成時または解答内容へのフィードバック生成時にエラーが発生しました。</p>
+    <p>申し訳ありませんが、トップページからやり直してください。</p>
+
+    <!-- ログイン中ユーザーかどうかでリンクを出し分け -->
+    <p>
+        <a th:if="${#authentication.authenticated}" th:href="@{/user/home}">ユーザートップページに戻る</a>
+        <a th:if="${not #authentication.authenticated}" th:href="@{/}">ゲスト用トップページに戻る</a>
+    </p>
+</body>
+</html>

@@ -4,7 +4,14 @@
 <!-- エラーメッセージ -->
 <!-- ${error}が存在する場合のみ表示　現在はユーザー名重複の場合のみ -->
 <p th:if="${error}" th:text="${error}"></p>
-<br>
+
+<div
+      style="background-color: #ffedd1; padding: 10px; border-left: 4px solid #ccc; margin-top: 1em; margin-bottom: 1em;">
+      <strong>注意：</strong>データベースにはRenderの無料PostgreSQL（30日のみ有効）を使用しており、有効期限が来たら作りなおす運用としています。
+      <br>そのため、ユーザー情報が定期的にリセットされるほか、ユーザー機能そのものが利用できないタイミングが発生することが予想されます。
+      <br>あらかじめご了承ください。
+</div>
+
 <!-- beforeSubmit()を使って自由入力の値とラジオボタンの値を両立 -->
 <form th:action="@{/register}" method="post" th:object="${userRegisterForm}" onsubmit="return beforeSubmit();">
     <div>

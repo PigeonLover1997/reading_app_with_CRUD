@@ -39,25 +39,24 @@ public class SecurityConfig {
             // ↑先に認証プロバイダの登録は不要（configureGlobal でやるので大丈夫）
             // ページごとのアクセス権を設定
             .authorizeHttpRequests(auth -> auth
-                // 誰でもアクセス可：トップページ、問題作成後の出題ページ、解答後のフィードバックページ、ユーザー登録ページ、CSS、Javascript
-                .requestMatchers("/","/generate", "/submitAnswers","/register","/register/**", "/css/**", "/js/**").permitAll() 
-                .anyRequest().authenticated() // 他は認証必須
+                // 管理者のみアクセス可：ユーザー管理ページ
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                // 誰でもアクセス可：トップページ、問題作成後の出題ページ、解答後のフィードバックページ、ユーザー登録ページ、エラーページ、CSS、Javascript
+                .requestMatchers("/","/generate", "/submitAnswers","/register","/register/**","/error", "/css/**", "/js/**").permitAll() 
+                .anyRequest().authenticated() // 他は認証（ユーザーログイン）必須
             )
             // フォームログインの設定
             .formLogin(form -> form
                 .loginPage("/login")      // ログインページのURL
-                .defaultSuccessUrl("/user/home", true) // ここを追加
+                .defaultSuccessUrl("/user/home", true) // ログイン成功後のリダイレクト先
                 .permitAll()              // 誰でもアクセス可
             )
             // ログアウトの設定
             .logout(logout -> logout
-                .logoutSuccessUrl("/?logout")    
-                // ログアウト後にゲスト用トップページにリダイレクト ログアウトを示すパラメータ"?logout"を付与
+                .logoutSuccessUrl("/?logout")    // ログアウト後にゲスト用トップページにリダイレクト ログアウトを示すパラメータ"?logout"を付与
             );
         return http.build();
     }
-
-
 
     //認証プロバイダを登録
     @Bean
