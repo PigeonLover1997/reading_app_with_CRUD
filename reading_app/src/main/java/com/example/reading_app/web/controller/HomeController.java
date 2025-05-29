@@ -14,11 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import com.example.reading_app.domain.model.User;
 import com.example.reading_app.domain.model.dto.FeedbackResultDto;
 import com.example.reading_app.domain.model.dto.ReadingTaskDto;
-import com.example.reading_app.domain.repository.UserRepository;
 import com.example.reading_app.domain.service.FeedbackGenerationService;
 import com.example.reading_app.domain.service.TaskGenerationService;
 import com.example.reading_app.domain.service.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 @SessionAttributes("task") // セッションにReadingTaskDtoを保持 問題採点時にも使用できるようにセッションに保存
@@ -29,9 +27,6 @@ public class HomeController {
 
     @Autowired
     private FeedbackGenerationService feedbackService;
-
-    @Autowired
-    private ObjectMapper objectMapper; // Jacksonのマッパーを注入
 
     @Autowired
     private UserService userService;

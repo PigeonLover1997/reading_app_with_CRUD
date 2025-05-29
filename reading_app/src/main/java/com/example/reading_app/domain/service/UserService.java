@@ -5,7 +5,6 @@ import com.example.reading_app.domain.repository.UserRepository;
 import com.example.reading_app.web.controller.dto.AdminUserEditForm;
 import com.example.reading_app.web.controller.dto.UserAccountForm;
 import com.example.reading_app.web.controller.dto.UserEditForm;
-import com.example.reading_app.web.controller.dto.UserRegisterForm;
 
 import jakarta.transaction.Transactional;
 
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service

@@ -1,7 +1,6 @@
 package com.example.reading_app.web.controller;
 import com.example.reading_app.domain.model.User;
 import com.example.reading_app.web.controller.dto.AdminUserEditForm;
-import com.example.reading_app.web.controller.dto.UserEditForm;
 import com.example.reading_app.domain.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
