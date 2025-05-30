@@ -1,34 +1,47 @@
-## Running the Project with Docker
-
-This project provides a Docker-based workflow for building and running the Java Spring Boot application using Docker Compose. Below are the project-specific instructions and requirements:
-
-### Project-Specific Docker Requirements
-- **Java Version:** Uses `eclipse-temurin:21-jdk` for building and `eclipse-temurin:21-jre` for running (Java 21 is required).
-- **Build Tool:** The Gradle wrapper is included and used for building the application inside the container.
-- **Non-root User:** The runtime container runs as a non-root user (`appuser`) for enhanced security.
-- **JVM Options:** Container-aware memory settings are enabled by default for optimal performance.
-
-### Environment Variables
-- No required environment variables are set by default in the Dockerfile or Docker Compose file.
-- To provide custom environment variables (e.g., for Spring Boot configuration), create a `.env` file in the `reading_app` directory and uncomment the `env_file` line in `compose.yaml`.
-
-### Build and Run Instructions
-1. **Build and Start the Application:**
-   ```sh
-   docker compose up --build
-   ```
-   This command will build the Docker image and start the application container.
-
-2. **Accessing the Application:**
-   - The application will be available at [http://localhost:8080](http://localhost:8080) by default.
-
-### Ports
-- **8080:** The application exposes port 8080 (default for Spring Boot), mapped to the same port on the host.
-
-### Special Configuration
-- The Docker Compose file defines a dedicated network (`reading_app_net`) for the service. No external dependencies are configured by default, but you can add them as needed.
-- If you need to add environment variables, external services, or change the port, update the `compose.yaml` accordingly.
+# AIを活用した英文読解&英作文トレーニングWebアプリ
 
 ---
 
-*This section was updated to reflect the current Docker-based setup for building and running the project.*
+## 概要
+以下2つの目的を想定して開発したサーバーサイドWebアプリです。
+
+1. **英語学習をもっと手軽に**  
+   - OpenAI APIを用いて、読解問題の本文＋選択式の読解問題＋英作文課題と、解答内容への自動フィードバックをリアルタイム生成  
+   - 難易度 (英検5級～1級越え相当まで、幅広く選択可能) と、読解問題のトピックと希望語数を指定するだけで練習を開始
+   - トピックは自由入力可能なので、自分の興味のある内容について書かれた英文で読解問題を解ける
+     
+2. **Webアプリ開発学習のポートフォリオとして**  
+   - Thymeleaf／Spring Boot／Spring Data JPAを用いた三層アーキテクチャ  
+   - 権限別（ADMIN/USER）のユーザー管理・認証機能
+   - データベースへの、ユーザーデータ（問題生成の希望条件）のCRUD
+
+>  **デモサイト**: https://reading-app-with-crud.onrender.com/
+　　
+---
+
+## 主な機能
+| ユーザー区分 | 機能 |
+| --- | --- |
+| ゲスト | • 難易度／語数／問題数／トピック選択 → 問題生成<br>• 選択問題と英作文を解答 → フィードバック生成<br>• AIによる採点、フィードバック、作文に役立つ英語表現の提示 |
+| ユーザー | •ログイン、ログアウト<br>•上記のゲスト用の機能に加え、難易度／語数／問題数／トピックの希望条件を保存し、ログイン時に自動入力<br>•自ユーザーの希望条件を自由に更新可<br>•自アカウントの削除（無効フラグを立てて論理削除）|
+| 管理者 | • ユーザー一覧の確認、各ユーザーの情報の編集／削除（DBからの物理削除） |
+
+
+---
+
+## 技術スタック
+| カテゴリ                 | 技術                                  | バージョン         | 備考                                                   |
+| -------------------- | ----------------------------------- | ------------- | ---------------------------------------------------- |
+| **言語**             | Java                      | 21            |          |
+| **言語**             | JavaScript                      |             |          |
+| **言語**             | CSS                      |             |          |
+| **言語**             | HTML                      | HTML Living Standard            |          |
+| **フレームワーク**       | Spring Boot           | BOM 管理（3.4.6）         | Web, Thymeleaf, Security, Data JPA, Validation, Actuator      |
+| **プラグイン**       | Spring Boot Gradle Plugin           | 3.4.6         | 各種Spring Bootや他プラグインのバージョン管理      |
+| **DB**          | PostgreSQL       |  | Renderの無料プランで提供されているものを使用<br>（有効期限：作成から30日）（失効したら作り直す運用を想定）   |
+| **DBマイグレーション**      | Flyway (Core + PostgreSQL モジュール)  | BOM 管理（3.4.6） |                                             |
+| **コンテナ**           | Docker        | 4.40.0  |                                       |
+| **デプロイ**          | Render      |  | GitHub連携での自動デプロイ           |
+| **その他**          | OpenAI API      |  | 問題の生成、解答内容へのフィードバックの生成（使用モデルはGPT-4.1 mini）           |
+| **その他**          | ChatGPT      |  | 要件定義や仕様設計の補助、コード作成、疑問点解消などの相談に使用           |
+
