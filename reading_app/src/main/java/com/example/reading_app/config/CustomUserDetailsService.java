@@ -10,7 +10,19 @@ import org.springframework.stereotype.Service;
 import com.example.reading_app.domain.model.User;
 import com.example.reading_app.domain.repository.UserRepository;
 
+/**
+ * このクラスは、Spring Security にユーザー情報を提供するサービスです。
+ * UserDetailsService インターフェースを実装しており、
+ * 「ユーザー名からユーザー情報を取得する」機能を担います。
+ * 
+ * Spring Security の認証処理中に自動的に呼び出されます。
+ * 
+ * サービスクラス：業務処理（ビジネスロジック）を担うクラス
+ * UserDetailsService インターフェース：Spring Security における、
+ *                                    ユーザー情報を取得するための標準インターフェース
+ */
 @Service
+// 0722ここまでコメント付加済み
 // Spring SecurityのUserDetailsServiceインターフェースを実装したクラス
 public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
