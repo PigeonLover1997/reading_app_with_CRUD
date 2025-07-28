@@ -1,7 +1,15 @@
 package com.example.reading_app.domain.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+// 0728ここまでコメント付加中
 
 @Entity //「このクラスはDBのテーブルにマッピングされるよ」と宣言するアノテーション
 // Spring Data JPAがこのクラスを「永続化エンティティ」として扱い、save()やfindById()などが使えるようになる

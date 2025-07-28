@@ -22,29 +22,39 @@ import com.example.reading_app.domain.repository.UserRepository;
  *                                    ユーザー情報を取得するための標準インターフェース
  */
 @Service
-// 0722ここまでコメント付加済み
+
 // Spring SecurityのUserDetailsServiceインターフェースを実装したクラス
 public class CustomUserDetailsService implements UserDetailsService {
+    // DB操作のための UserRepository を注入
     @Autowired
     private UserRepository userRepository;
 
     // Spring の DI（依存性注入）コンテナが起動時に UserRepository のインスタンスを渡して、このサービスクラスを生成する
-    // loadUserByUsername(...) の内部でユーザー検索を行う際、userRepository を利用して DB
-    // からユーザーを取得できるようにするための初期化処理
+    // loadUserByUsername(...) の内部でユーザー検索を行う際、userRepository を利用して 
+    // DBからユーザーを取得できるようにするための初期化処理
     public CustomUserDetailsService(UserRepository repo) {
         this.userRepository = repo;
     }
 
+    /**
+     * 認証時に Spring Security がこのメソッドを呼び出す。
+     * ここで「ユーザー名」に対応するユーザー情報をDBから取得し、
+     * 認証のための UserDetails（CustomUserDetails）として返す。
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // ユーザー名でDBからユーザー情報を検索
         User user = userRepository.findByUsername(username)
-                // Spring Security
-                // の認証フィルター（内部ロジック）が自動でこの例外をキャッチし、「ログイン失敗」として扱い、エラーメッセージの表示（th:if="${param.error}"）につなげる
+                // 見つからない場合は UsernameNotFoundException をスロー
+                // Spring Securityの認証フィルター（内部ロジック）が自動でこの例外をキャッチし、「ログイン失敗」として扱い、エラーメッセージの表示（th:if="${param.error}"）につなげる
                 .orElseThrow(() -> new UsernameNotFoundException("ユーザーが見つかりません"));
-        // ユーザーが無効状態の場合        
+        // ユーザーが無効状態の場合はログイン不可
         if (!user.getIsActive()) {
             throw new DisabledException("無効なアカウントです（削除済、停止されているなど）");
         }
+        // 通常通りユーザーが見つかり、アカウントも有効なら、
+        // CustomUserDetails にラップして返す
+        // CustomUserDetails implements UserDetailsなので、メソッドの戻り値の型の定義は UserDetails で問題ない
         return new CustomUserDetails(user); // 標準のUserDetailsではなく、独自のCustomUserDetailsを返す
     }
 }
