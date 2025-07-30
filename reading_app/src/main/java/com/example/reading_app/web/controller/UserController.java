@@ -1,9 +1,7 @@
 package com.example.reading_app.web.controller;
 
-import com.example.reading_app.config.CustomUserDetails;
-import com.example.reading_app.domain.model.User;
-import com.example.reading_app.domain.service.UserService;
-import com.example.reading_app.web.controller.dto.UserEditForm;
+import java.util.List;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,22 +9,38 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
+import com.example.reading_app.config.CustomUserDetails;
+import com.example.reading_app.domain.model.User;
+import com.example.reading_app.domain.service.UserService;
+import com.example.reading_app.web.controller.dto.UserEditForm;
 
+/**
+ * このコントローラは、「ユーザー本人のプロフィール編集」に関する画面遷移・処理を担当。
+ * Webブラウザからのリクエスト（GET/POST）を受け取り、サービス層を通してロジックを実行し、
+ * HTMLテンプレートを返す。
+ */
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/user") // このコントローラのすべてのURLに /user をプレフィックスとして付ける
 public class UserController {
 
     // UserService 用のフィールドを追加
     private final UserService userService;
 
-    // ここで Spring が UserService を渡してくれる
+    // ここで Spring が UserService を渡してくれる（コンストラクタインジェクション）（@Autowired は省略可能）
     public UserController(UserService userService) {
         this.userService = userService;
     }
+
+    // @ModelAttribute メソッドは、コントローラ内で定義したオブジェクトや値を、
+    // Thymeleafなどのテンプレートで使えるようにするためのアノテーション
+
+    // 0730ここまでコメント付加済
 
     // （登録時と共通の選択肢リストを使うなら、@ModelAttribute メソッドで共通化も可）
     @ModelAttribute("levels")

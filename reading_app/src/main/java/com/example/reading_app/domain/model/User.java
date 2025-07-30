@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-// 0728ここまでコメント付加中
 
 @Entity //「このクラスはDBのテーブルにマッピングされるよ」と宣言するアノテーション
 // Spring Data JPAがこのクラスを「永続化エンティティ」として扱い、save()やfindById()などが使えるようになる
@@ -20,22 +19,29 @@ import jakarta.persistence.Table;
 // このアノテーションを省略すると、クラス名と同じテーブル名
 
 public class User {
+    // JPAで主キーを指定するアノテーション　自動採番とセットで使うことが多い
     @Id
     // 一意のIDを自動採番するアノテーション
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long id;
 
+    // ユーザー名を保存するカラム
+    // nullable = falseは「nullを許容しない」、unique = trueは「一意であることを保証する」、
+    // length = 100は「最大文字数を100に制限する」という意味
     @Column(nullable = false, unique = true, length = 100)
     private String username;
 
+    // パスワードのハッシュ値を保存するカラム
     // フィールド名とカラム名を別にする場合name属性でカラム名を指定
     // Javaはキャメルケース、DBはスネークケースが一般的
     @Column(nullable = false, name = "password_hash", length = 255)
     private String passwordHash;
 
+    // ユーザーのロールを示すカラム
     @Column(nullable = false, length = 20)
     private String role = "USER"; // "USER" or "ADMIN"。初期値USER
 
+    // ユーザーの作成日時を保存するカラム
     @Column(nullable = false, name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now(); // 初期値として現在時刻を設定
 
