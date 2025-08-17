@@ -6,7 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-// ユーザー登録フォーム用DTO
+/**
+ * ユーザー登録フォーム用DTO（データ転送オブジェクト）
+ * Webフォームの入力内容を一時的に保持してコントローラに渡す役割を持つクラス。
+ * 登録画面（/register）と対応。
+ */
 public class UserRegisterForm {
     // 登録時のみ必須。編集画面では含まない
     @NotBlank(message = "ユーザー名は必須です")
@@ -30,7 +34,7 @@ public class UserRegisterForm {
     @Max(value = 10, message = "問題数は1以上10以下で設定してください")
     private Integer questionCount; // 選択式問題の数
     
-    private String topic;         // トピック（以上4項目を後から追加）
+    private String topic;         // トピック
 
     // getter / setter
     public String getUsername() { return username; }

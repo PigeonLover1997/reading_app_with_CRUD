@@ -1,187 +1,197 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>ユーザー情報編集（管理者用）</title>
     <style>
-      .field { margin-bottom: 1em; }
-      .free-word-input { width: 10ch; }
+        .field {
+            margin-bottom: 1em;
+        }
+
+        .free-word-input {
+            width: 10ch;
+        }
     </style>
 </head>
+
 <body>
-<h1>ユーザー情報編集（管理者専用）</h1>
+    <h1>ユーザー情報編集（管理者専用）</h1>
 
-<!-- 更新完了メッセージ -->
-<p th:if="${updateSuccess}" th:text="${updateSuccess}" style="color:green;"></p>
+    <!-- 更新完了メッセージ -->
+    <p th:if="${updateSuccess}" th:text="${updateSuccess}" style="color:green;"></p>
 
-<form th:action="@{|/admin/users/${userId}|}" method="post" th:object="${adminUserEditForm}" onsubmit="return beforeSubmit();">
-    <!-- バリデーションエラー表示 -->
-    <p th:if="${#fields.hasErrors()}" style="color:red;">入力内容に誤りがあります。</p>
+    <!-- 編集フォーム開始。submit時にJavaScriptで前処理を実行 -->
+    <form th:action="@{|/admin/users/${userId}|}" method="post" th:object="${adminUserEditForm}"
+        onsubmit="return beforeSubmit();">
+        <!-- バリデーションエラー表示 -->
+        <p th:if="${#fields.hasErrors()}" style="color:red;">入力内容に誤りがあります。</p>
+        <!-- IDは編集不可だが送信は必要なため、hiddenにして持たせる -->
+        <input type="hidden" th:field="*{id}" />
 
-    <input type="hidden" th:field="*{id}" />
-
-    <div>
-        <label>ユーザー名: <input type="text" th:field="*{username}" required /></label>
-        <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red;"></span>
-    </div>
-
-    <div>
-        <label>パスワード: <input type="password" th:field="*{password}" placeholder="空欄なら変更なし" /></label>
-        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red;"></span>
-    </div>
-    <br>
-    <div>
-        <label>権限:
-            <label><input type="radio" th:field="*{role}" value="USER" />ユーザー</label>
-            <label><input type="radio" th:field="*{role}" value="ADMIN" />管理者</label>
-        </label>
-        <span th:if="${#fields.hasErrors('role')}" th:errors="*{role}" style="color:red;"></span>
-    </div>
-    <br>
-    <div>
-        <label>有効/無効:
-            <label><input type="radio" th:field="*{isActive}" th:value="true" />有効</label>
-            <label><input type="radio" th:field="*{isActive}" th:value="false" />無効</label>
-        </label>
-        <span th:if="${#fields.hasErrors('isActive')}" th:errors="*{isActive}" style="color:red;"></span>
-    </div>
-    <br>
-    <div>
-        <label>難易度 (CEFR):</label><br />
-        <div th:each="lvl : ${levels}">
-            <label th:switch="${lvl}">
-                <input type="radio" th:field="*{difficulty}" th:value="${lvl}" required />
-          <!-- 各CEFRの場合に応じた難易度目安を表示 -->
-          <span th:case="'Below A1'">
-            入門（目安：英検5～4級）
-          </span>
-          <span th:case="'A1'">
-            A1 （目安：英検3級／TOEIC 300）
-          </span>
-          <span th:case="'A2'">
-            A2 （目安：英検準2級／TOEIC 450）
-          </span>
-          <span th:case="'B1'">
-            B1 （目安：英検2級／TOEIC 600）
-          </span>
-          <span th:case="'B2'">
-            B2 （目安：英検準1級／TOEIC 800）
-          </span>
-          <span th:case="'C1'">
-            C1 （目安：英検1級／TOEIC 950）
-          </span>
-          <span th:case="'C2'">
-            C2 （目安：英検1級+α／TOEIC 990+α）
-          </span>
-          <span th:case="'Over C2'">
-            超上級（目安：英語ネイティブの大人でも難しい）
-          </span>
-                <span th:case="*"><span th:text="${lvl}">?</span></span>
-            </label>
+        <div>
+            <label>ユーザー名: <input type="text" th:field="*{username}" required /></label>
+            <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red;"></span>
         </div>
-        <span th:if="${#fields.hasErrors('difficulty')}" th:errors="*{difficulty}" style="color:red;"></span>
-    </div>
-    <br>
 
-    <!-- 希望語数 -->
-    <div class="field">
-        <label>希望語数:</label><br />
-        <div th:each="cnt : ${defaultWordCounts}">
+        <div>
+            <label>パスワード: <input type="password" th:field="*{password}" placeholder="空欄なら変更なし" /></label>
+            <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red;"></span>
+        </div>
+        <br>
+        <div>
+            <label>権限:
+                <label><input type="radio" th:field="*{role}" value="USER" />ユーザー</label>
+                <label><input type="radio" th:field="*{role}" value="ADMIN" />管理者</label>
+            </label>
+            <span th:if="${#fields.hasErrors('role')}" th:errors="*{role}" style="color:red;"></span>
+        </div>
+        <br>
+        <div>
+            <label>有効/無効:
+                <label><input type="radio" th:field="*{isActive}" th:value="true" />有効</label>
+                <label><input type="radio" th:field="*{isActive}" th:value="false" />無効</label>
+            </label>
+            <span th:if="${#fields.hasErrors('isActive')}" th:errors="*{isActive}" style="color:red;"></span>
+        </div>
+        <br>
+        <div>
+            <label>難易度 (CEFR):</label><br />
+            <div th:each="lvl : ${levels}">
+                <label th:switch="${lvl}">
+                    <input type="radio" th:field="*{difficulty}" th:value="${lvl}" required />
+                    <!-- 各CEFRの場合に応じた難易度目安を表示 -->
+                    <span th:case="'Below A1'">
+                        入門（目安：英検5～4級）
+                    </span>
+                    <span th:case="'A1'">
+                        A1 （目安：英検3級／TOEIC 300）
+                    </span>
+                    <span th:case="'A2'">
+                        A2 （目安：英検準2級／TOEIC 450）
+                    </span>
+                    <span th:case="'B1'">
+                        B1 （目安：英検2級／TOEIC 600）
+                    </span>
+                    <span th:case="'B2'">
+                        B2 （目安：英検準1級／TOEIC 800）
+                    </span>
+                    <span th:case="'C1'">
+                        C1 （目安：英検1級／TOEIC 950）
+                    </span>
+                    <span th:case="'C2'">
+                        C2 （目安：英検1級+α／TOEIC 990+α）
+                    </span>
+                    <span th:case="'Over C2'">
+                        超上級（目安：英語ネイティブの大人でも難しい）
+                    </span>
+                    <span th:case="*"><span th:text="${lvl}">?</span></span>
+                </label>
+            </div>
+            <span th:if="${#fields.hasErrors('difficulty')}" th:errors="*{difficulty}" style="color:red;"></span>
+        </div>
+        <br>
+
+        <!-- 希望語数 -->
+        <div class="field">
+            <label>希望語数:</label><br />
+            <div th:each="cnt : ${defaultWordCounts}">
+                <label>
+                    <input type="radio" name="wordCountRadio" th:value="${cnt}"
+                        th:checked="${cnt} == ${adminUserEditForm.wordCount}" />
+                    <span th:text="${cnt}" />語
+                </label>
+            </div>
+            <!-- 自由入力 -->
             <label>
-                <input type="radio" name="wordCountRadio" th:value="${cnt}"
-                       th:checked="${cnt} == ${adminUserEditForm.wordCount}" />
-                <span th:text="${cnt}" />語
+                <input type="radio" name="wordCountRadio" value="0"
+                    th:checked="${not #lists.contains(defaultWordCounts, adminUserEditForm.wordCount)}" />
+                自由入力：
+                <input type="number" id="customWordCount" name="customWordCount" min="1" max="2000"
+                    class="free-word-input"
+                    th:value="${not #lists.contains(defaultWordCounts, adminUserEditForm.wordCount) ? adminUserEditForm.wordCount : ''}" />
+                語（1～2000の整数）
             </label>
+            <span th:if="${#fields.hasErrors('wordCount')}" th:errors="*{wordCount}" style="color:red;"></span>
+            <input type="hidden" th:field="*{wordCount}" id="wordCountFinal" />
         </div>
-        <!-- 自由入力 -->
-        <label>
-            <input type="radio" name="wordCountRadio" value="0"
-                   th:checked="${not #lists.contains(defaultWordCounts, adminUserEditForm.wordCount)}" />
-            自由入力：
-            <input type="number" id="customWordCount" name="customWordCount" min="1" max="2000"
-                   class="free-word-input"
-                   th:value="${not #lists.contains(defaultWordCounts, adminUserEditForm.wordCount) ? adminUserEditForm.wordCount : ''}" />
-            語（1～2000の整数）
-        </label>
-        <span th:if="${#fields.hasErrors('wordCount')}" th:errors="*{wordCount}" style="color:red;"></span>
-        <input type="hidden" th:field="*{wordCount}" id="wordCountFinal" />
-    </div>
-    <br>
+        <br>
 
-    <!-- 選択式問題の数 -->
-    <div class="field">
-        <label>選択式問題の数:</label><br />
-        <div th:each="num : ${defaultQuestionCounts}">
+        <!-- 選択式問題の数 -->
+        <div class="field">
+            <label>選択式問題の数:</label><br />
+            <div th:each="num : ${defaultQuestionCounts}">
+                <label>
+                    <input type="radio" name="questionCountRadio" th:value="${num}"
+                        th:checked="${num} == ${adminUserEditForm.questionCount}" />
+                    <span th:text="${num}" />問
+                </label>
+            </div>
+            <!-- 自由入力 -->
             <label>
-                <input type="radio" name="questionCountRadio" th:value="${num}"
-                       th:checked="${num} == ${adminUserEditForm.questionCount}" />
-                <span th:text="${num}" />問
+                <input type="radio" name="questionCountRadio" value="0"
+                    th:checked="${not #lists.contains(defaultQuestionCounts, adminUserEditForm.questionCount)}" />
+                自由入力：
+                <input type="number" id="customQuestionCount" name="customQuestionCount" min="1" max="10"
+                    class="free-word-input"
+                    th:value="${not #lists.contains(defaultQuestionCounts, adminUserEditForm.questionCount) ? adminUserEditForm.questionCount : ''}" />
+                問（1～10の整数）
             </label>
+            <span th:if="${#fields.hasErrors('questionCount')}" th:errors="*{questionCount}" style="color:red;"></span>
+            <input type="hidden" th:field="*{questionCount}" id="questionCountFinal" />
         </div>
-        <!-- 自由入力 -->
-        <label>
-            <input type="radio" name="questionCountRadio" value="0"
-                   th:checked="${not #lists.contains(defaultQuestionCounts, adminUserEditForm.questionCount)}" />
-            自由入力：
-            <input type="number" id="customQuestionCount" name="customQuestionCount" min="1" max="10"
-                   class="free-word-input"
-                   th:value="${not #lists.contains(defaultQuestionCounts, adminUserEditForm.questionCount) ? adminUserEditForm.questionCount : ''}" />
-            問（1～10の整数）
-        </label>
-        <span th:if="${#fields.hasErrors('questionCount')}" th:errors="*{questionCount}" style="color:red;"></span>
-        <input type="hidden" th:field="*{questionCount}" id="questionCountFinal" />
-    </div>
-    <br>
+        <br>
 
-    <div>
-        <label for="topic">トピック（任意）:</label>
-        <input type="text" th:field="*{topic}" placeholder="例: AIを活用した英語学習" />
-        <span th:if="${#fields.hasErrors('topic')}" th:errors="*{topic}" style="color:red;"></span>
-    </div>
-    <br>
+        <div>
+            <label for="topic">トピック（任意）:</label>
+            <input type="text" th:field="*{topic}" placeholder="例: AIを活用した英語学習" />
+            <span th:if="${#fields.hasErrors('topic')}" th:errors="*{topic}" style="color:red;"></span>
+        </div>
+        <br>
 
-    <button type="submit">更新</button>
-</form>
+        <button type="submit">更新</button>
+    </form>
 
-<!-- 削除ボタン -->
-<form th:action="@{|/admin/users/${userId}/delete|}" method="post" style="margin-top:1em;">
-    <button type="submit" onclick="return confirm('本当に削除しますか？');" style="color:red;">このユーザーを削除</button>
-</form>
+    <!-- 削除ボタン -->
+    <form th:action="@{|/admin/users/${userId}/delete|}" method="post" style="margin-top:1em;">
+        <button type="submit" onclick="return confirm('本当に削除しますか？');" style="color:red;">このユーザーを削除</button>
+    </form>
 
-<p>
-    <a th:href="@{/admin/users}">ユーザー一覧に戻る</a>
-</p>
+    <p>
+        <a th:href="@{/admin/users}">ユーザー一覧に戻る</a>
+    </p>
 
-<script>
-    // 語数・問題数の自由入力欄の有効/無効制御と値セット
-    function toggleCustomWordCount() {
-        var useCustom = document.querySelector('input[name="wordCountRadio"]:checked').value === "0";
-        document.getElementById('customWordCount').disabled = !useCustom;
-        // hiddenフィールドに値セット
-        document.getElementById('wordCountFinal').value = useCustom ? document.getElementById('customWordCount').value : document.querySelector('input[name="wordCountRadio"]:checked').value;
-    }
-    function toggleCustomQuestionCount() {
-        var useCustom = document.querySelector('input[name="questionCountRadio"]:checked').value === "0";
-        document.getElementById('customQuestionCount').disabled = !useCustom;
-        // hiddenフィールドに値セット
-        document.getElementById('questionCountFinal').value = useCustom ? document.getElementById('customQuestionCount').value : document.querySelector('input[name="questionCountRadio"]:checked').value;
-    }
-    function beforeSubmit() {
-        toggleCustomWordCount();
-        toggleCustomQuestionCount();
-        return true;
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        // 初期状態セット
-        toggleCustomWordCount();
-        toggleCustomQuestionCount();
-        // ラジオボタン変更時
-        document.querySelectorAll('input[name="wordCountRadio"]').forEach(r => r.addEventListener('change', toggleCustomWordCount));
-        document.getElementById('customWordCount').addEventListener('input', toggleCustomWordCount);
+    <script>
+        // 語数・問題数の自由入力欄の有効/無効制御と値セット
+        function toggleCustomWordCount() {
+            var useCustom = document.querySelector('input[name="wordCountRadio"]:checked').value === "0";
+            document.getElementById('customWordCount').disabled = !useCustom;
+            // hiddenフィールドに値セット
+            document.getElementById('wordCountFinal').value = useCustom ? document.getElementById('customWordCount').value : document.querySelector('input[name="wordCountRadio"]:checked').value;
+        }
+        function toggleCustomQuestionCount() {
+            var useCustom = document.querySelector('input[name="questionCountRadio"]:checked').value === "0";
+            document.getElementById('customQuestionCount').disabled = !useCustom;
+            // hiddenフィールドに値セット
+            document.getElementById('questionCountFinal').value = useCustom ? document.getElementById('customQuestionCount').value : document.querySelector('input[name="questionCountRadio"]:checked').value;
+        }
+        function beforeSubmit() {
+            toggleCustomWordCount();
+            toggleCustomQuestionCount();
+            return true;
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            // 初期状態セット
+            toggleCustomWordCount();
+            toggleCustomQuestionCount();
+            // ラジオボタン変更時
+            document.querySelectorAll('input[name="wordCountRadio"]').forEach(r => r.addEventListener('change', toggleCustomWordCount));
+            document.getElementById('customWordCount').addEventListener('input', toggleCustomWordCount);
 
-        document.querySelectorAll('input[name="questionCountRadio"]').forEach(r => r.addEventListener('change', toggleCustomQuestionCount));
-        document.getElementById('customQuestionCount').addEventListener('input', toggleCustomQuestionCount);
-    });
-</script>
+            document.querySelectorAll('input[name="questionCountRadio"]').forEach(r => r.addEventListener('change', toggleCustomQuestionCount));
+            document.getElementById('customQuestionCount').addEventListener('input', toggleCustomQuestionCount);
+        });
+    </script>
 </body>
+
 </html>

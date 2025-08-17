@@ -40,13 +40,25 @@ public class UserController {
     // @ModelAttribute メソッドは、コントローラ内で定義したオブジェクトや値を、
     // Thymeleafなどのテンプレートで使えるようにするためのアノテーション
 
-    // 0730ここまでコメント付加済
+    /*
+     * @ModelAttribute("名前")
+     * public 型 メソッド名() {
+     * return 値;
+     * }
+     * のようにすると返り値がテンプレートに自動的に渡され、${名前} で参照できるようになる。
+     */
 
-    // （登録時と共通の選択肢リストを使うなら、@ModelAttribute メソッドで共通化も可）
     @ModelAttribute("levels")
     public List<String> levels() {
         return List.of("Below A1", "A1", "A2", "B1", "B2", "C1", "C2", "Over C2");
     }
+    /*
+     * Thymeleafでの参照例
+     * <select name="difficulty">
+     * <option th:each="level : ${levels}" th:value="${level}"
+     * th:text="${level}"></option>
+     * </select>
+     */
 
     @ModelAttribute("defaultWordCounts")
     public List<Integer> defaultWordCounts() {
@@ -58,12 +70,18 @@ public class UserController {
         return List.of(1, 2, 3, 4, 5);
     }
 
-    /** プロフィール編集フォームを表示 */
+    // --- 以下がプロフィール編集機能の実処理 ---
+
+    /**
+     * ユーザープロフィールの編集フォーム画面を表示する（GETリクエスト）
+     */
     @GetMapping("/edit") // クラスについている共通部分@RequestMapping("/user")の続き
     public String showEditForm(
+            // @AuthenticationPrincipal アノテーションで、
+            // ログイン中のユーザー情報を、コントローラの引数として自動的に受け取る
             @AuthenticationPrincipal CustomUserDetails loginUser,
             Model model) {
-        // 確認用
+        // セキュリティのログイン情報を取得して、ログに出す確認処理（学習用途）
         // この時点で loginUser が null かどうかをチェック
         System.out.println("loginUser via @AuthenticationPrincipal: " + loginUser);
 
@@ -81,12 +99,10 @@ public class UserController {
             System.out.println(">>> principal.toString(): " + principal);
         }
 
-        // ここで loginUser が null の場合はリダイレクトなどの処理を入れると安心です
+        // ログインしていない場合はログイン画面にリダイレクト
         if (loginUser == null) {
             return "redirect:/login";
         }
-
-        // （以下、元の処理）
 
         // DB から現在のユーザー情報を取得
         User user = userService.findById(loginUser.getId());
@@ -99,33 +115,37 @@ public class UserController {
         form.setTopic(user.getTopic());
         // パスワードはここでは設定しない
 
+        // フォームとフラグをモデルに登録
         model.addAttribute("userEditForm", form);
         model.addAttribute("isEdit", true);
-        return "user_edit"; // 登録ページを流用
+        return "user_edit"; // templates/user_edit.html を表示
     }
 
-    /** プロフィール更新処理 */
+    /**
+     * ユーザープロフィールの更新処理（POSTリクエスト）
+     */
     @PostMapping("/edit")
     public String updateProfile(
             @AuthenticationPrincipal CustomUserDetails loginUser,
-            @ModelAttribute("userEditForm") @Validated UserEditForm form,
+            @ModelAttribute("userEditForm") @Validated UserEditForm form, // バリデーション付きでフォームを受け取る
             BindingResult result,
             RedirectAttributes redirectAttributes) {
-
-if (result.hasErrors()) {
-    result.getFieldErrors().forEach(error -> {
-        System.out.println("フィールド: " + error.getField() +
-            ", エラー内容: " + error.getDefaultMessage());
-    });
-    result.getGlobalErrors().forEach(error -> {
-        System.out.println("グローバルエラー: " + error.getDefaultMessage());
-    });
-    return "user_edit";
-}
-
+        // 入力チェック（バリデーション）でエラーがある場合
+        if (result.hasErrors()) {
+            // コンソールにエラー内容を出力（学習やデバッグ用途）
+            result.getFieldErrors().forEach(error -> {
+                System.out.println("フィールド: " + error.getField() +
+                        ", エラー内容: " + error.getDefaultMessage());
+            });
+            result.getGlobalErrors().forEach(error -> {
+                System.out.println("グローバルエラー: " + error.getDefaultMessage());
+            });
+            return "user_edit";// 入力エラーがあったらもう一度フォームを表示
+        }
+        // サービス経由でDBに更新
         userService.updateProfile(loginUser.getId(), form);
-
+        // リダイレクト先で1回だけ表示されるメッセージを渡す
         redirectAttributes.addFlashAttribute("updateSuccess", "プロフィールを更新しました");
-        return "redirect:/user/home"; // 編集後はマイページなどへリダイレクト
+        return "redirect:/user/home"; // 編集後はマイページへリダイレクト
     }
 }

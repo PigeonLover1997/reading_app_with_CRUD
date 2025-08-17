@@ -1,26 +1,31 @@
 package com.example.reading_app.domain.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType; // ランダムトピック取得用
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
-
 import com.example.reading_app.domain.model.dto.ReadingTaskDto;
-import com.example.reading_app.util.TopicPool; // ランダムトピック取得用
+import com.example.reading_app.util.TopicPool;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * ChatGPT API を呼び出し、
  * ・指定 CEFR レベル・語数・トピック の長文読解パッセージ
  * ・指定数の選択式問題（4 選択肢＋正解インデックス）
  * ・英作文問題用の指示文
- * をまとめて生成し、Java オブジェクトとして返すサービス
+ * をまとめて生成し、Java オブジェクトとして返すサービスクラス
  */
-@Service
+@Service// SpringのサービスクラスとしてDI管理される
 public class TaskGenerationService {
-
+    // application.propertiesなどに定義された値を自動で読み込む
     @Value("${openai.api.url}")
     private String apiUrl;
 
@@ -30,7 +35,9 @@ public class TaskGenerationService {
     @Value("${openai.model}")
     private String model;
 
+    // 外部APIを呼び出すためのクラス
     private final RestTemplate restTemplate = new RestTemplate();
+    // JSON文字列をJavaオブジェクトに変換するためのクラス
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -86,23 +93,23 @@ public class TaskGenerationService {
                 + "\"mcqs\" (array of {question:string, options:[string], answerLabel:string}), "
                 + "\"compositionPrompt\" (string).";
 
-        // ② リクエストボディを構築
+        // ② リクエストボディ（APIへの中身）を構築
         Map<String, Object> body = new HashMap<>();
         body.put("model", model);
         List<Map<String, String>> messages = new ArrayList<>();
-        messages.add(Map.of("role", "system", "content", systemPrompt));
+        messages.add(Map.of("role", "system", "content", systemPrompt));// 会話形式でGPTに渡す
         body.put("messages", messages);
 
-        // ③ HTTP ヘッダー設定
+        // ③ HTTPリクエストヘッダー（認証やContentTypeの指定）
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(apiKey);
+        headers.setContentType(MediaType.APPLICATION_JSON);// JSONとして送る
+        headers.setBearerAuth(apiKey);// APIキーを使って認証
 
         // ④ API 呼び出し
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
         Map<?, ?> response = restTemplate.postForObject(apiUrl, request, Map.class);
 
-        // ⑤ レスポンスから JSON 部分を抽出し、Task オブジェクトにパース
+        // ⑤ ChatGPTのレスポンスから JSON 部分を抽出し、Task オブジェクトにパース
         List<?> choices = (List<?>) response.get("choices");
         @SuppressWarnings("unchecked")
         Map<String, Object> message = (Map<String, Object>) ((Map<String, ?>) choices.get(0)).get("message");

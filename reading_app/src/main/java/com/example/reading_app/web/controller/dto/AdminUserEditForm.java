@@ -6,6 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+/**
+ * 管理者がユーザーを編集するときに使うフォームクラス（DTO）
+ * - ユーザー登録情報を一時的に保持し、画面とコントローラの間でデータを受け渡す
+ * - 入力チェック（バリデーション）にも対応
+ */
 public class AdminUserEditForm {
 
     // 編集フォームでhiddenで持つ想定（DBの主キー、管理者でも編集不可）
@@ -24,7 +29,7 @@ public class AdminUserEditForm {
     @NotNull(message = "有効・無効を選択してください")
     private Boolean isActive;
 
-    // ユーザー・管理者共通編集可能項目
+    // 以下、ユーザー・管理者共通編集可能項目
     @NotBlank(message = "難易度は必須です")
     private String difficulty;
 
@@ -41,25 +46,87 @@ public class AdminUserEditForm {
     private String topic;
 
     // getter / setter
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
-    public Boolean getIsActive() { return isActive; }
-    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
-    public String getDifficulty() { return difficulty; }
-    public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
-    public Integer getWordCount() { return wordCount; }
-    public void setWordCount(Integer wordCount) { this.wordCount = wordCount; }
-    public Integer getQuestionCount() { return questionCount; }
-    public void setQuestionCount(Integer questionCount) { this.questionCount = questionCount; }
-    public String getTopic() { return topic; }
-    public void setTopic(String topic) { this.topic = topic; }
+    public Long getId() {
+        return id;
+    }
 
-    // グループインターフェース
-    public interface PasswordRequired {}
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public Integer getWordCount() {
+        return wordCount;
+    }
+
+    public void setWordCount(Integer wordCount) {
+        this.wordCount = wordCount;
+    }
+
+    public Integer getQuestionCount() {
+        return questionCount;
+    }
+
+    public void setQuestionCount(Integer questionCount) {
+        this.questionCount = questionCount;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    // バリデーションのグループ指定に使用
+    // （例：パスワードは任意入力で、空なら変更なしとみなし入力時にだけチェックしたいときなど）
+    public interface PasswordRequired {
+    }
+    /*
+     * このクラス内の
+     * 
+     * @Size(min = 4, message = "パスワードは4文字以上で入力してください（テスト用バリデーション）"
+     * , groups = PasswordRequired.class) ←ここで指定している
+     * private String password;
+     */
 }

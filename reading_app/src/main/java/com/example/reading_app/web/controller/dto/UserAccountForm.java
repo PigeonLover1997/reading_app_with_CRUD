@@ -3,6 +3,15 @@ package com.example.reading_app.web.controller.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/**
+ * ユーザー自身がアカウント設定画面で
+ * ・ユーザー名の変更
+ * ・パスワードの変更
+ * を行うためのフォームクラス（DTO）。
+ *
+ * - HTMLフォームで入力された値を受け取り、
+ * - コントローラに渡してバリデーションやサービス処理に使う。
+ */
 public class UserAccountForm {
 // ユーザー自身によるユーザー情報（ユーザー名・パスワード）の編集用DTO
 
