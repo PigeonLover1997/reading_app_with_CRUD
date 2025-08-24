@@ -21,7 +21,7 @@ import com.example.reading_app.domain.model.dto.ReadingTaskDto;
 import com.example.reading_app.domain.service.FeedbackGenerationService;
 import com.example.reading_app.domain.service.TaskGenerationService;
 import com.example.reading_app.domain.service.UserService;
-
+//0824ここまでコメント付加
 @Controller
 @SessionAttributes("task") // セッションにReadingTaskDtoを保持 問題採点時にも使用できるようにセッションに保存
 public class HomeController {

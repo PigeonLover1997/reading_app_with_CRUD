@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+// トピックをランダムにした際にここから選ぶためのクラス
 public class TopicPool {
     private static final List<String> TOPICS = Collections.unmodifiableList(Arrays.asList(
         // トピック300個を記載

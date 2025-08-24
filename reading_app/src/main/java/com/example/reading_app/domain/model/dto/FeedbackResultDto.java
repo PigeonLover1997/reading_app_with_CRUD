@@ -2,8 +2,9 @@ package com.example.reading_app.domain.model.dto;
 
 import java.util.List;
 
+// DTO：画面やAPIとのデータの受け渡し専用の入れ物となるクラス
 public class FeedbackResultDto {
-    // 選択式問題の採点結果
+    // 選択式問題の採点結果を保持する内部クラス
     public static class McqResult {
         private int questionIndex;
         private boolean correct;
@@ -44,7 +45,7 @@ public class FeedbackResultDto {
         }
     }
 
-    // 英作文のスコアと講評
+    // 英作文のスコアと講評を保持する内部クラス
     public static class CompositionScores {
         private int grammarAndUsageScore;
         private int contentScore;
@@ -75,7 +76,7 @@ public class FeedbackResultDto {
         }
     }
 
-    // 文法・語法フィードバック（ミス箇所と修正案と理由）
+    // 文法・語法フィードバック（ミス箇所と修正案と理由）を保持する内部クラス
     public static class GrammarAndUsageFeedback {
         private String grammarAndUsageError;
         private String correction;
@@ -107,14 +108,13 @@ public class FeedbackResultDto {
         }
     }
 
-    // ↑３つの DTO をネストで定義しましたが、必要なら別ファイルでも OK
-
-    private List<McqResult> mcqResults;
-    private CompositionScores compositionScores;
-    private List<GrammarAndUsageFeedback> grammarAndUsageFeedback;
-    private List<String> usefulPhrases;
-    private String highlightedPassage; // 問題文のハイライト HTML
-    private int passageWordCount;
+    private List<McqResult> mcqResults; // 選択式問題の採点結果一覧
+    private CompositionScores compositionScores; // 英作文のスコアと講評
+    private List<GrammarAndUsageFeedback> grammarAndUsageFeedback; // 文法・語法フィードバック一覧
+    // 上記は上述の内部クラスの形で定義されている
+    private List<String> usefulPhrases; // 有用なフレーズ一覧
+    private String highlightedPassage; // 問題文の中でハイライトしたHTML
+    private int passageWordCount; // 問題文の語数
 
     // getter/setter
     public List<McqResult> getMcqResults() {

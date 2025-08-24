@@ -3,8 +3,8 @@ package com.example.reading_app.domain.model.dto;
 import java.util.List;
 
 public class MCQDto {
-    private String question;
-    private List<String> options;
+    private String question; // 質問文
+    private List<String> options; // 選択肢リスト
     private String answerLabel;  // "A" or "B" ...
     // getter / setter
     public String getQuestion() {

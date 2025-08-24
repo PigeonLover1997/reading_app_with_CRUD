@@ -14,17 +14,43 @@
     }
 
     body {
-      font-family: sans-serif;/* フォント指定 */
-      margin: 1em;/* 外側に余白 */
+      font-family: sans-serif;
+      /* フォント指定 */
+      margin: 1em;
+      /* 外側に余白 */
     }
 
-/* 20250817ここまでコメント付加 */
+
+    /* CSSの基本構文 
+    セレクタ {
+    プロパティ: 値;
+    プロパティ: 値;
+    }
+    
+    セレクタ … HTMLのどの要素にスタイルを適用するかを指定する部分
+      ・タグセレクタ
+      例: p { ... }
+      → <p>〜</p> すべてに適用
+
+      ・クラスセレクタ（.）
+      例: .header-container { ... }
+      → class="header-container" が付いている要素に適用
+
+      ・IDセレクタ（#）
+      例: #timer { ... }
+      → id="timer" が付いている要素に適用
+
+    { ... } の中 … その要素に対して適用する「ルール（プロパティと値の組み合わせ）」
+    */
 
     /* ヘッダーとタイマー */
     .header-container {
       position: relative;
       margin-bottom: 1em;
     }
+
+    /* .header-container は、class="header-container" を持つHTML要素を選択 */
+    /* 「position」プロパティ：HTML要素の配置ルールを決める */
 
     .header-container h1 {
       display: inline-block;
@@ -40,19 +66,19 @@
 
     /* レイアウト */
     .flex-container {
-      display: flex;
-      gap: 1em;
+      display: flex; /* 横並び */
+      gap: 1em; /* 要素間の隙間 */
     }
 
     .passage,
     .questions {
       border: 1px solid #ccc;
       padding: 1em;
-      overflow-y: auto;
+      overflow-y: auto; /* 内容が多いときスクロール */
     }
 
     .passage {
-      flex: 1 1 50%;
+      flex: 1 1 50%; /* 幅を50%ずつ */
       max-height: 80vh;
     }
 
@@ -82,22 +108,27 @@
 
       .passage,
       .questions {
+        /* スマホでは縦並びにしたいので、PC版レイアウトにあるフレックスの伸縮・縮小の性質を解除 */
         flex: none;
-        /* 幅固定を解除 */
+        /* スマホでは縦並びなので、横幅は半分じゃなくて画面いっぱい */
         width: 100%;
-        /* 横幅いっぱい */
+        /* PC表示では max-height: 80vh;　vh = viewport height の略 → 画面の高さに対する割合のパーセント*/
         max-height: 40vh;
-        /* お好みで調整 */
       }
     }
 
-    /* MCQ */
+    /* MCQ（Multiple Choice Questions：選択式の問題） */
     .mcq {
       margin-bottom: 1em;
     }
 
+    /* 「クラス名 mcq-options を持つ要素の中にある <label> 要素」 を対象にする */
     .mcq-options label {
       display: block;
+      /* display プロパティは要素の表示方法を指定する */
+      /* inline（インライン要素） → 横に並ぶ、幅・高さの指定が効かない（例: <span>、<a>） */
+      /* block（ブロック要素） → 縦に並ぶ、横幅いっぱいに広がる（例: <div>、<p>、<h1>） */
+      /* <label> タグは、通常は inline要素 として扱われるため、ここでは縦に並べることを明示 */
     }
 
     /* 語数表示・入力カウンタ */
@@ -112,20 +143,20 @@
     @media (max-width: 768px) {
       input[type="radio"] {
         transform: scale(1.25);
+        /* テキストとの間の余白も調整 */
         margin-right: 6px;
-        /* テキストとの間の余白も調整（任意） */
-        vertical-align: middle;
         /* 縦位置も調整（任意） */
+        vertical-align: middle;
       }
     }
-    
+
     /* ヘッダー部分のレイアウト */
     h1 {
       margin-top: 0em;
       margin-bottom: 0.5em;
       padding-top: 0;
       padding-bottom: 0;
-      font-size: 1em;  /* サイズも控えめにしたい場合 */
+      font-size: 1em;
     }
   </style>
 </head>
@@ -136,6 +167,8 @@
     <h1>出題ページ</h1>
   </div>
 
+  <!-- 左右2カラムのレイアウト -->
+  <!-- スマホの場合はflex-direction: column;で上下にする -->
   <div class="flex-container">
     <!-- 左: 問題文 -->
     <div class="passage">
@@ -161,8 +194,9 @@
             <label>
               <input type="radio" th:name="${'mcq_' + iterStat.index}"
                 th:value="${'ABCD'.substring(optStat.index, optStat.index + 1)}" required />
-              <!-- ラベルはここで付与 -->
+              <!-- 選択肢のラベル(A)～(D)はここで付与 -->
               <span th:text="${'(' + 'ABCD'.substring(optStat.index, optStat.index + 1) + ') ' + opt}" />
+              <!-- ↑は閉じタグなしの記法　↓は閉じタグありの記法　↑を使う場合は</span>はなくてもよい -->
               <!-- <span th:text="${'(' + 'ABCD'.substring(optStat.index, optStat.index + 1) + ') ' + opt}"> -->
               </span>
             </label>
@@ -184,17 +218,17 @@
   <script>
     // --- タイマー処理 ---
     const timerEl = document.getElementById('timer');
-    const startTime = Date.now();
+    const startTime = Date.now(); // 開始時間を記録
     function updateTimer() {
-      const diff = Math.floor((Date.now() - startTime) / 1000);
-      const mm = String(Math.floor(diff / 60)).padStart(2, '0');
-      const ss = String(diff % 60).padStart(2, '0');
-      timerEl.textContent = `(time passed: ${mm}:${ss})`;
+      const diff = Math.floor((Date.now() - startTime) / 1000); // 経過秒数
+      const mm = String(Math.floor(diff / 60)).padStart(2, '0'); // 分
+      const ss = String(diff % 60).padStart(2, '0'); // 秒
+      timerEl.textContent = `(time passed: ${mm}:${ss})`; // 表示更新
     }
-    setInterval(updateTimer, 1000);
-    updateTimer();
+    setInterval(updateTimer, 1000); // 1秒ごとに実行
+    updateTimer(); // 初回実行
 
-    // --- 単語数カウント関数 ---
+    // --- 単語数カウント関数（空白で分割してカウント） ---
     function countWords(text) {
       const trimmed = text.trim();
       return trimmed ? trimmed.split(/\s+/).length : 0;

@@ -75,11 +75,8 @@
       .passage,
       .questions {
         flex: none;
-        /* 幅固定を解除 */
         width: 100%;
-        /* 横幅いっぱい */
         max-height: 40vh;
-        /* お好みで調整 */
       }
     }
 
@@ -96,9 +93,7 @@
       input[type="radio"] {
         transform: scale(1.25);
         margin-right: 6px;
-        /* テキストとの間の余白も調整（任意） */
         vertical-align: middle;
-        /* 縦位置も調整（任意） */
       }
     }
 
@@ -108,7 +103,7 @@
       margin-bottom: 0.5em;
       padding-top: 0;
       padding-bottom: 0;
-      font-size: 1em;  /* サイズも控えめにしたい場合 */
+      font-size: 1em; 
     }
   </style>
 </head>
@@ -136,7 +131,7 @@
 
         <div class="mcq-options" th:each="opt,optStat : ${mcq.options}">
           <label>
-            <!-- ユーザーが選択したものだけ checked -->
+            <!-- ユーザーが選択したものだけ checkedにし、どれを選択したかをわかるようにする（選択肢をdisabledにしつつ） -->
             <input type="radio" th:disabled="true"
               th:checked="${userAnswers[idxStat.index] == 'ABCD'.substring(optStat.index, optStat.index+1)}" />
             <span th:text="${'(' + 'ABCD'.substring(optStat.index, optStat.index+1) + ') ' + opt}" />
